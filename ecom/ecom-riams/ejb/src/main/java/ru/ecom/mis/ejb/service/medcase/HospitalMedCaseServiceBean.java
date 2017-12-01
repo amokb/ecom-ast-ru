@@ -2839,7 +2839,7 @@ public String getDefaultParameterByConfig (String aParameter, String aDefaultVal
 	private WebQueryResult recordN1(XmlDocument xmlDoc, Element zap, Object[] obj, boolean aIsCreateWQR) {
 
 		XmlUtil.recordElementInDocumentXml(xmlDoc,zap,"N_NPR","",true,"") ;
-		XmlUtil.recordElementInDocumentXml(xmlDoc,zap,"N_NPR_LPU",obj[23],false,"") ;
+		if (obj.length>23) XmlUtil.recordElementInDocumentXml(xmlDoc,zap,"N_NPR_LPU",obj[23],false,"") ;
 		XmlUtil.recordElementInDocumentXml(xmlDoc,zap,"D_NPR",obj[0],true,"") ;
 		XmlUtil.recordElementInDocumentXml(xmlDoc,zap,"FOR_POM",obj[1],true,"") ;
 		XmlUtil.recordElementInDocumentXml(xmlDoc,zap,"NCODE_MO",obj[2],true,"") ;
@@ -3900,7 +3900,8 @@ public String getDefaultParameterByConfig (String aParameter, String aDefaultVal
 		sqlB.append(" 		and forchild=case when bf.forChild='1' then cast('1' as varchar(1)) else cast('0' as varchar(1)) end ");
 		sqlB.append(" 		and hdf.bedsubtype=case when vbst.code='3' then '2' else vbst.code end") ;
 		sqlB.append("		and prehospdate between to_date('").append(aDateFrom).append("','yyyy-MM-dd') and to_date('").append(aDateTo).append("','yyyy-MM-dd')") ;
-		sqlB.append("		and hospitalmedcase_id is null and hdf.directLpuCode=lpu.codef) as a5mountDirect") ;
+		sqlB.append("		and (hospitalmedcase_id is null or (select sls.datestart from medcase sls where sls.id=hdf.hospitalmedcase_id)<to_date('").append(aDateFrom).append("','yyyy-MM-dd') ) ");
+		sqlB.append("       and hdf.directLpuCode=lpu.codef) as a5mountDirect") ;
 		sqlB.append("  from BedFund bf ");
 		sqlB.append("   left join VocBedType vbt on vbt.id=bf.bedType_id");
 		sqlB.append("   left join VocBedSubType vbst on vbst.id=bf.bedSubType_id");
