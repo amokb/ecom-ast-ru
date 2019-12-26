@@ -102,7 +102,7 @@
     </msh:form>
       	<tags:pres_intake_biomaterial name="Bio" role="/Policy/Mis/Journal/Prescription/LabSurvey/DoctorLaboratory"/>
       	<tags:pres_labDoctorPrescription name="LabDoctor" />
-    
+	 	<tags:presBarcode name="presBarcode"/>
     <script type='text/javascript'>
     //checkFieldUpdate('typeIntake','${typeIntake}',1) ;
     //checkFieldUpdate('typeMaterial','${typeMaterial}',1) ;
@@ -222,6 +222,7 @@
     ,case when mc.datestart is null and p.cancelDate is null then replace(list(''||p.id),' ','')||''','''||coalesce(vsst.biomaterial,'-') else null end as j21cancelAllTime
     , case when p.medcase_id is not null then 'Выполнил: '||suLab.fullName ||' '|| to_char(mc.createdate,'dd.MM.yyyy')||' '||cast(mc.createTime as varchar(5))
       || case when mc.datestart is not null then ' Подтвердил: '||suLabDoc.fullName||' '||to_char(mc.editdate,'dd.MM.yyyy')||' '||cast(mc.edittime as varchar(5)) else '' end else '' end as f22_executeinfo
+    ,p.id as f23pId
     from prescription p
     left join VocPrescriptCancelReason vpcr on vpcr.id=p.cancelreason_id
     left join VocPrescriptType vpt on vpt.id=p.prescriptType_id
@@ -261,7 +262,7 @@
     ,p.medCase_id,mc.workFunctionExecute_id,mc.dateStart,vsst.code
     ,wp.lastname,wp.middlename,wp.firstname,vwf.name,mc.id,ml.name
     ,p.canceldate,p.materialid,p.planstartdate
-    ,vsst.biomaterial,d.record,d.id, ht.id, suLab.fullName, suLabDoc.fullName
+    ,vsst.biomaterial,d.record,d.id, ht.id, suLab.fullName, suLabDoc.fullName, p.id
     order by pat.lastname,pat.firstname,pat.middlename
     
     "/>
@@ -288,7 +289,7 @@
 	      <msh:tableColumn columnName ="Выполнил" property="22"/>
 	      <msh:tableButton property="20" hideIfEmpty="true" role="/Policy/Mis/Journal/Prescription/LabSurvey/DoctorLaboratory" buttonFunction="showLabDoctorDirMedService" buttonName="Добавить анализ" buttonShortName="Доб.А"/>
 		  <msh:tableButton property="21" hideIfEmpty="true" role="/Policy/Mis/Journal/Prescription/LabSurvey/DoctorLaboratory" buttonFunction="makePatology" buttonName="Критическая патология" buttonShortName="Критическая патология" />
-
+			<msh:tableButton buttonFunction="makeBarcode" property="23" buttonShortName="|||||"/>
 		</msh:table>
 	    <script type="text/javascript">
 	    
@@ -343,6 +344,9 @@
               }
 		  }
 
+		function makeBarcode(aPrescriptId) {
+			showpresBarcodeIntakeInfoDialog(aPrescriptId);
+		}
   	</script>
   </tiles:put>
 </tiles:insert>

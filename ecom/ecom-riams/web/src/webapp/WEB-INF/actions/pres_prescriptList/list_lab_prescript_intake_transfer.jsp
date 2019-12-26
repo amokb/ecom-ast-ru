@@ -99,7 +99,7 @@
     </msh:form>
       	<tags:pres_intake_biomaterial name="Bio" role="/Policy/Mis/Journal/Prescription/LabSurvey/IsCheckTransfer"/>
       	<tags:pres_transferByBarcode name="Barcode" />
-    
+        <tags:presBarcode name="presBarcode"/>
     <script type='text/javascript'>
     checkFieldUpdate('typeIntake','${typeIntake}',1) ;
     //checkFieldUpdate('typeMaterial','${typeMaterial}',1) ;
@@ -301,6 +301,7 @@
        ,coalesce(wfCab.groupName,'')||' '||to_char(p.transferDate,'dd.mm.yyyy')||' '||cast(p.transferTime as varchar(5)) as f14dttransfer
        ,to_char(p.cancelDate,'dd.mm.yyyy')||' '||cast(p.cancelTime as varchar(5)) as f15dtcancel
   , case when p.barcodeNumber is not null then 'ШК №'||p.barcodeNumber end as f16_barcode
+    ,p.id as f17PresId
     from prescription p
     
     left join PrescriptionList pl on pl.id=p.prescriptionList_id
@@ -333,7 +334,7 @@
     group by ${addByGroup}pat.id,pat.lastname,pat.firstname,pat.middlename
     ,vsst.name  , ssSls.code,ssslo.code,pl.medCase_id,pl.id
     ,p.intakedate,pat.birthday,iwp.lastname,iwp.firstname,iwp.middlename,p.intakeTime
-    ,p.transferDate,p.transferTime,vsst.biomaterial,p.cancelDAte,p.cancelTime,wfCab.groupName, p.barcodeNumber, ht.id
+    ,p.transferDate,p.transferTime,vsst.biomaterial,p.cancelDAte,p.cancelTime,wfCab.groupName, p.barcodeNumber, ht.id, p.id
     order by pat.lastname,pat.firstname,pat.middlename
     "/>
     
@@ -368,6 +369,7 @@
 	      <msh:tableColumn columnName="Дата и время приема в лабораторию" property="14"/>
 	      <msh:tableColumn columnName="Дата и время отбраковки" property="15"/>
 	      <msh:tableColumn columnName="Список услуг" property="10"/>
+            <msh:tableButton buttonFunction="makeBarcode" property="17" buttonShortName="|||||"/>
 	    </msh:table>
 	    <script type="text/javascript">
 	    
@@ -478,6 +480,10 @@
   	    		cancelBioIntakeInfo();
   	    	}	
   		}
+
+        function makeBarcode(aPrescriptId) {
+            showpresBarcodeIntakeInfoDialog(aPrescriptId);
+        }
   	  serviceSubTypeAutocomplete.addOnChangeCallback(function() {checkfrm()}) ;
   	  departmentAutocomplete.addOnChangeCallback(function() {checkfrm()}) ;
   	  prescriptTypeAutocomplete.addOnChangeCallback(function() {checkfrm()}) ;

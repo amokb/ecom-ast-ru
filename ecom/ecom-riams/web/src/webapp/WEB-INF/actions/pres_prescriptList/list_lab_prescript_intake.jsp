@@ -40,6 +40,7 @@
   		request.setAttribute("endDate", endDate) ;
   	%>
   	<tags:pres_intakeDate name="Biomat" service="PrescriptionService" method="intakeService"/>
+	  <tags:presBarcode name="presBarcode"/>
   	  <msh:form action="/pres_journal_intake.do" defaultField="beginDate" disableFormDataConfirm="true" method="GET">
     <msh:panel guid="6ae283c8-7035-450a-8eb4-6f0f7da8a8ff">
       <msh:row guid="53627d05-8914-48a0-b2ec-792eba5b07d9">
@@ -174,6 +175,7 @@
    ,vst.name as vstname
     ,'<input type=''checkbox'' name=''labCheckbox'' value='''||list(''||p.id)||'''>'
     ,list(vpt.name)
+    ,p.id as f18PresId
     from prescription p
     left join PrescriptionList pl on pl.id=p.prescriptionList_id
     left join MedCase slo on slo.id=pl.medCase_id
@@ -203,7 +205,7 @@
     group by ${addByGroup} pat.id,pat.lastname,pat.firstname,pat.middlename
     ,vsst.name  , ssSls.code,ssslo.code,pl.medCase_id,pl.id
     ,p.intakedate,pat.birthday,iwp.lastname,iwp.firstname,iwp.middlename,p.intakeTime,p.planStartDate
-    ,vst.name, ht.id
+    ,vst.name, ht.id,p.id
     order by pat.lastname,pat.firstname,pat.middlename
     "/>
     
@@ -263,7 +265,7 @@
     ,vsst.name  , ssSls.code,ssslo.code,pl.medCase_id,pl.id
     ,p.intakedate,pat.birthday,iwp.lastname,iwp.firstname,iwp.middlename,p.intakeTime
     ,p.planStartDate , vst.name,vpt.name
-    order by vsst.name,pat.lastname,pat.firstname,pat.middlename"> 
+    order by vsst.name,pat.lastname,pat.firstname,pat.middlename">
 	    <input type='hidden' name="sqlInfo" id="sqlInfo" value='Список пациентов за ${beginDate}-${endDate} по отделению ${lpu_name}'>
 	    <input type='hidden' name="sqlColumn" id="sqlColumn" value="${groupName}">
 	    <input type='hidden' name="s" id="s" value="PrintService">
@@ -363,9 +365,7 @@
 	      <msh:tableColumn columnName="Отчетство" property="8"/>
 	      <msh:tableColumn columnName="Дата рождения" property="9"/>
 	      <msh:tableColumn columnName="Список услуг" property="10"/>
-	      <msh:tableColumn columnName="Тип назначения" property="17"/>
-	      
-
+			<msh:tableButton buttonFunction="makeBarcode" property="18" buttonShortName="|||||"/>
 	    </msh:table>
 
     </msh:sectionContent>
@@ -403,6 +403,10 @@
 				}); 
   		}
   		serviceSubTypeAutocomplete.addOnChangeCallback(function() {checkfrm()}) ;
+
+  		function makeBarcode(aPrescriptId) {
+            showpresBarcodeIntakeInfoDialog(aPrescriptId);
+		}
   	</script>
   </tiles:put>
 </tiles:insert>

@@ -1597,4 +1597,23 @@ public class PrescriptionServiceJs {
 			return "Невозможно отменить назначение! Уже было отменено или находится в работе. Можно отменять невыполненные назначения.";
 		}
 	}
+
+	/* Получить информацию о назначении для штрих-кода
+	 * @param aPrescriptId ИД назначения
+	 * @param service
+	 * @return String Информация в формате 999ddmmyyyhh24mmssИДбиом
+	 * (999 - для отличия от других шк, дата, время без знаков, ИБ биоматериала)
+	 * @throws NamingException
+	 * */
+	public String getPrBarCodeInfo(String aPrescriptId,HttpServletRequest aRequest) throws NamingException {
+		IWebQueryService service = Injection.find(aRequest).getService(IWebQueryService.class) ;
+		Collection<WebQueryResult> list = service.executeNativeSql("select cast('999' as varchar(3))||to_char(intakedate,'ddmmyyyy')" +
+				"||to_char(intaketime,'HH24MISS')||id from prescription p where id="+aPrescriptId) ;
+		if (!list.isEmpty() && list.iterator().next().get1()!=null) {
+			String barcodeNumber = list.iterator().next().get1().toString();
+			service.executeUpdateNativeSql("update prescription set barcodeNumber='"+barcodeNumber+"' where id="+aPrescriptId);
+			return barcodeNumber;
+		}
+		else return "";
+	}
 }
