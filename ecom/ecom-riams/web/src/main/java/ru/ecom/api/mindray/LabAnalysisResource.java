@@ -25,14 +25,18 @@ public class LabAnalysisResource {
         String aToken=getJsonField(root,"token");
         if (aToken!=null) {ApiUtil.login(aToken,aRequest);}
         ApiUtil.init(aRequest,aToken);
-        System.out.println("data " + getJsonField(root,"data"));
 
-        /*IPrescriptionService theService = Injection.find(aRequest).getService(IPrescriptionService.class) ;
+        IPrescriptionService theService = Injection.find(aRequest).getService(IPrescriptionService.class) ;
         try {
-            theService.readJsonMindray(getJsonField(root,"data"));
+            String data = getJsonField(root,"data").toString();
+            if (data.startsWith("["))
+                data = data.substring(1);
+            if (data.endsWith("]"))
+                data = data.substring(0,data.length()-1);
+            theService.readJsonMindray(data);
         } catch (Exception e){
             System.out.println(e);
-        }*/
+        }
     }
 
     private <T>T getJsonField(JSONObject obj, String aProperty) {

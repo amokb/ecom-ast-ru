@@ -2,7 +2,7 @@ package ru.ecom.diary.ejb.service.protocol;
 
 import java.util.List;
 
-public class ParsedPdfInfo {
+public class ParsedInfo {
 
 	/** Номер пробирки */
 	public String getBarcode() {return theBarcode;}
@@ -11,9 +11,9 @@ public class ParsedPdfInfo {
 	private String theBarcode;
 	
 	/** Список показателей */
-	public List<ParsedPdfInfoResult> getResults() {return theResults;}
-	public void setResults(List<ParsedPdfInfoResult> aResults) {theResults = aResults;}
+	public List<ParsedInfoResult> getResults() {return theResults;}
+	public void setResults(List<ParsedInfoResult> aResults) {theResults = aResults;}
 	/** Список показателей */
-	private List<ParsedPdfInfoResult> theResults;
+	private List<ParsedInfoResult> theResults;
 
 }

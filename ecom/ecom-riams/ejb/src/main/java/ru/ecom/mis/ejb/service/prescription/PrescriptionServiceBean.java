@@ -3,21 +3,15 @@ package ru.ecom.mis.ejb.service.prescription;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import ru.ecom.diary.ejb.domain.protocol.parameter.FormInputProtocol;
 import ru.ecom.diary.ejb.domain.protocol.parameter.Parameter;
 import ru.ecom.diary.ejb.domain.protocol.parameter.user.UserValue;
-import ru.ecom.diary.ejb.service.protocol.ParsedPdfInfo;
-import ru.ecom.diary.ejb.service.protocol.ParsedPdfInfoResult;
+import ru.ecom.diary.ejb.service.protocol.ParsedInfo;
+import ru.ecom.diary.ejb.service.protocol.ParsedInfoResult;
 import ru.ecom.ejb.sequence.service.SequenceHelper;
 import ru.ecom.ejb.services.entityform.ILocalEntityFormService;
 import ru.ecom.ejb.services.live.domain.CustomMessage;
 import ru.ecom.ejb.services.util.ConvertSql;
-import ru.ecom.ejb.util.injection.EjbEcomConfig;
 import ru.ecom.mis.ejb.domain.lpu.MisLpu;
 import ru.ecom.mis.ejb.domain.medcase.*;
 import ru.ecom.mis.ejb.domain.patient.ColorIdentityPatient;
@@ -42,12 +36,8 @@ import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.text.DecimalFormat;
@@ -62,119 +52,62 @@ import java.util.*;
 public class PrescriptionServiceBean implements IPrescriptionService {
 	private static final Logger LOG = Logger.getLogger(PrescriptionServiceBean.class);
 
-	public void checkXmlFiles() throws ParserConfigurationException, SAXException, IOException {
-
-		String homeDirectory  =  getDir("jboss.lab.xmldir","/opt/lab");
-		String xmlDirectory = homeDirectory + "/xml/";
-        String xmlArchDirectory = homeDirectory + "/archive/";
-        
-        File[] fileList = getFiles(xmlDirectory);
-        
-        if (fileList.length>0) {
-        	LOG.debug("Найдено "+fileList.length+" файлов");
-        	
-        	for (File file: fileList) {
-	        	String fileName = file.getName();
-	        	String[] expansions = fileName.split("\\.");
-	            if(expansions[1].equals("xml")) {
-	        		List<ParsedPdfInfo> l = readXML(xmlDirectory+fileName);
-					for (ParsedPdfInfo parsedPdfInfo:l) {
-						setDefaultDiary(parsedPdfInfo);
-					}
-	        		moveFile(xmlDirectory,xmlArchDirectory,fileName);
-	        	}
-        	}
-	    } else {
-	    	LOG.warn("Файлов не найдено, заканчиваем...");
-	    }
+	/**
+	 * Обработать информацию с лаб. анализатора
+	 * @param jsonPresc Информация в json
+	 * @return
+	 */
+	public void readJsonMindray(String jsonPresc) {
+		LOG.info("got json: "+jsonPresc);
+		ParsedInfo parsedInfo = getPrescFromJson(jsonPresc);
+		setDefaultDiary(parsedInfo);
 	}
-	
-	private static List<ParsedPdfInfo> readXML(String namefile) throws ParserConfigurationException, SAXException, IOException {
-		ParsedPdfInfo parsedPdfInfo ;
-		List<ParsedPdfInfoResult> parsedPdfInfoResults = new ArrayList<>();
-        List<ParsedPdfInfo>parsedPdfInfos = new ArrayList<>();
-        DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
-        f.setValidating(false);
-        DocumentBuilder builder = f.newDocumentBuilder();
-            Document doc = builder.parse(new File(namefile));
-            NodeList nodeList = doc.getElementsByTagName("Message");
-        
-            for (int i = 0; i < nodeList.getLength(); i++) {
-            	 parsedPdfInfo = new ParsedPdfInfo();
 
-                 Node node = nodeList.item(i);
-                 if (Node.ELEMENT_NODE == node.getNodeType()) {
-                     Element element = (Element) node;
-
-                     parsedPdfInfo.setBarcode(element.getElementsByTagName("Barcode").item(i).getTextContent());
-
-                     for (int j = 0; j < element.getElementsByTagName("Name").getLength(); j++) {
-
-                         ParsedPdfInfoResult parsedPdfInfoResult = new ParsedPdfInfoResult();
-                         parsedPdfInfoResult.setCode(element.getElementsByTagName("Name").item(j).getTextContent());
-                         parsedPdfInfoResult.setValue(element.getElementsByTagName("Result").item(j).getTextContent());
-                         parsedPdfInfoResults.add(parsedPdfInfoResult);
-                     }
-                     parsedPdfInfo.setResults(parsedPdfInfoResults);
-                 }
-                 parsedPdfInfos.add(parsedPdfInfo);
-            }
-            
-            return parsedPdfInfos;
+	/**
+	 * Получить список назначений для сохранения из json
+	 * @param jsonPresc Информация в json
+	 * @return List<ParsedInfo>
+	 */
+	private ParsedInfo getPrescFromJson(String jsonPresc) {
+		ParsedInfo parsedInfo = new ParsedInfo() ;
+		List<ParsedInfoResult> parsedInfoResults = new ArrayList<>();
+		JSONObject parsedInfoJson = new JSONObject(jsonPresc);
+		LOG.info(parsedInfoJson);
+		parsedInfo.setBarcode(parsedInfoJson.getString("barcode"));
+		LOG.info("barcode: "+parsedInfoJson.getString("barcode"));
+		JSONArray parsedInfoResultsJson = parsedInfoJson.getJSONArray("resultOfAnalyzes");
+		LOG.info("parsedInfoResultsJson.length: "+parsedInfoResultsJson.length());
+		for (int i=0; i<parsedInfoResultsJson.length(); i++) {
+			JSONObject result = parsedInfoResultsJson.getJSONObject(i);
+			ParsedInfoResult parsedInfoResult = new ParsedInfoResult();
+			parsedInfoResult.setCode(result.getString("testName"));
+			parsedInfoResult.setValue(result.getString("testResult"));
+			parsedInfoResults.add(parsedInfoResult);
+		}
+		parsedInfo.setResults(parsedInfoResults);
+		return parsedInfo;
 	}
-	
-	public String getDir(String aKey, String aDefaultValue) {
-		EjbEcomConfig config = EjbEcomConfig.getInstance() ;
-		return config.get(aKey, aDefaultValue) ;
-	}
-	
-	/** Вывод всех файлов в папке */
-	    public static File[] getFiles(String path) {
-	     	try {
-	         File dir = new File(path);
-	         return dir.listFiles(new FilenameFilter() {
-				 public boolean accept(File dir, String name) {
-					 return name.toLowerCase().endsWith(".xml");
-				 }});
-	     	} catch(Exception e) {
-	     		LOG.error("Директория не обнаружена. Проверьте правильность.",e);
-	     		return new File[0];
-	     	}
-	     }
 
-	    private static void moveFile(String pdfDirectory, String archDirectory, String fileName) {
-	        try {
-	            final File myFile = new File(pdfDirectory + fileName );
-	            if (myFile.renameTo(new File(archDirectory + fileName))) {
-	                LOG.info("Файл "+ fileName + " успешно перенесен из директории " + pdfDirectory + " в директорию " + archDirectory);
-	            } else {
-					LOG.warn("Файл не был перенесен!");
-	            }
-	        } catch (Exception e) {
-	            LOG.error("ОШибка переноса файла",e);
-	        }
-	    }
-
-	public String setDefaultDiary(ParsedPdfInfo parsedPdfInfo) {
-		if (parsedPdfInfo==null) {
+	public String setDefaultDiary(ParsedInfo parsedInfo) {
+		if (parsedInfo==null) {
 			LOG.error("NO_RESULT");
 			return "";
 		}
-		String barcode = parsedPdfInfo.getBarcode();
+		String barcode = parsedInfo.getBarcode();
 		if (!StringUtil.isNullOrEmpty(barcode)) {
-		
+
 		StringBuilder sb = new StringBuilder() ;
 		StringBuilder err = new StringBuilder() ;
 		StringBuilder sql = new StringBuilder() ;
-		
-		
+
+
 		StringBuilder sqlAdd= new StringBuilder();
-		List<ParsedPdfInfoResult> results =parsedPdfInfo.getResults();
+		List<ParsedInfoResult> results =parsedInfo.getResults();
 		for(int i=0;i<results.size();i++) {
 			if(i>0){sqlAdd.append(",");}
 			sqlAdd.append("'").append(results.get(i).getCode()).append("'");
 		}
-		
+
 		sql.append("select pres.id as pid, ms.id as msid, max(tp.id) as templateId "+
 					"from prescription pres "+
 					"left join medservice ms on ms.id=pres.medservice_id "+
@@ -205,7 +138,7 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 					", vd.id as v15did,vd.name as v16dname"+
 					", p.cntdecimal as p17cntdecimal"+
 					", ''||p.id||case when p.type='2' then 'Name' else '' end as p18enterid "+
-					", ").append(createSQLQuery(parsedPdfInfo)).append(" as p19valuetextdefault "+
+					", ").append(createSQLQuery(parsedInfo)).append(" as p19valuetextdefault "+
 					",case when uv.useByDefault='1' then uv.name else '' end as p20valueVoc "+
 					"from prescription pres "+
 					"left join templateprotocol tp on tp.medservice_id=pres.medservice_id "+
@@ -216,9 +149,9 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 					"left join vocMeasureUnit vmu on vmu.id=p.measureUnit_id "+
 					"where pres.id=").append(pid).append(" and pres.barcodeNumber ='").append(barcode).append("'"+
 					"order by pf.position");
-				
+
 					List<Object[]> lwqr = theManager.createNativeQuery(sql.toString()).getResultList();
-	
+
 					sb.setLength(0);
 					sb.append("{");
 					sb.append("\"workFunction\":\"0\",") ;
@@ -250,9 +183,9 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 								String strValue = value!=null?(!value.toString().equals("null")?value.toString():""):"";
 								if(isFirtMethod) par.append(", ") ;else isFirtMethod=true;
 								par.append("\"").append(prop[1]).append("\":\"").append(str(strValue)).append("\"") ;
-								
+
 							}
-							
+
 						} catch (Exception e) {
 							throw new IllegalStateException(e);
 						}
@@ -273,24 +206,24 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 			    saveLabAnalyzed(0L,pid,0L,sb.toString(),username, templateId) ;
 				} catch(Exception e){
 					LOG.error(e.getMessage(),e);
-				} 
+				}
 			}
 			}
 
 		return sb.toString();
-		
+
 		} else {
 			LOG.info("Штрих код пустой, либо это нет");
 			return null;
 		}
-				
+
 	}
-	
-	 private String createSQLQuery (ParsedPdfInfo parsedPdfInfo) {
+
+	 private String createSQLQuery (ParsedInfo parsedInfo) {
 	        StringBuilder s = new StringBuilder();
 	        s.append("case");
-	       List<ParsedPdfInfoResult> r = parsedPdfInfo.getResults(); 
-	        for (ParsedPdfInfoResult p: r) {
+	       List<ParsedInfoResult> r = parsedInfo.getResults();
+	        for (ParsedInfoResult p: r) {
 	            s.append(" when p.externalcode='").append(p.getCode()).append("' then '").append(p.getValue()).append("' ");
 	        }
 	        s.append(" end");

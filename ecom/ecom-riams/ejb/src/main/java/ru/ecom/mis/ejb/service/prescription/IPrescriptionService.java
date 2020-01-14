@@ -14,8 +14,6 @@ import java.text.ParseException;
  * @author STkacheva
  */
 public interface IPrescriptionService {
-	
-	void checkXmlFiles() throws ParserConfigurationException, SAXException, IOException;
 
 	void setPatientDateNumber(String aPrescriptions, String aDate, String aTime, String aUsername, Long aSpec ) throws ParseException ;
 	Long clonePrescription(Long aPrescriptionId, Long aMedServiceId, Long aWorkFunctionId, String aCreateUsername) ;
@@ -70,4 +68,5 @@ public interface IPrescriptionService {
 	void sendMessageCurrentDate(String messageText, String messageTitle, String recipient
 			,String username,String messageUrl, Boolean isEmergency);
 	void setPatientIdentityBracelet(String infoStr);
+	void readJsonMindray(String jsonPresc);
 }

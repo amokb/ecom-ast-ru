@@ -1,6 +1,6 @@
 package ru.ecom.diary.ejb.service.protocol;
 
-public class ParsedPdfInfoResult {
+public class ParsedInfoResult {
 	/** Код показателя */
 	public String getCode() {return theCode;}
 	public void setCode(String aCode) {theCode = aCode;}
