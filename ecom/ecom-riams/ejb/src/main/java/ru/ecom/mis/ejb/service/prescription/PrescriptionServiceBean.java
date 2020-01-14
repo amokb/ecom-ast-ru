@@ -72,17 +72,17 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 		ParsedInfo parsedInfo = new ParsedInfo() ;
 		List<ParsedInfoResult> parsedInfoResults = new ArrayList<>();
 		JSONObject parsedInfoJson = new JSONObject(jsonPresc);
-		LOG.info(parsedInfoJson);
 		parsedInfo.setBarcode(parsedInfoJson.getString("barcode"));
-		LOG.info("barcode: "+parsedInfoJson.getString("barcode"));
 		JSONArray parsedInfoResultsJson = parsedInfoJson.getJSONArray("resultOfAnalyzes");
-		LOG.info("parsedInfoResultsJson.length: "+parsedInfoResultsJson.length());
 		for (int i=0; i<parsedInfoResultsJson.length(); i++) {
 			JSONObject result = parsedInfoResultsJson.getJSONObject(i);
-			ParsedInfoResult parsedInfoResult = new ParsedInfoResult();
-			parsedInfoResult.setCode(result.getString("testName"));
-			parsedInfoResult.setValue(result.getString("testResult"));
-			parsedInfoResults.add(parsedInfoResult);
+			String resName="testName",res="testResult";
+			if (result.has(resName) && result.has(res)) {
+				ParsedInfoResult parsedInfoResult = new ParsedInfoResult();
+				parsedInfoResult.setCode(result.getString(resName));
+				parsedInfoResult.setValue(result.getString(res));
+				parsedInfoResults.add(parsedInfoResult);
+			}
 		}
 		parsedInfo.setResults(parsedInfoResults);
 		return parsedInfo;
