@@ -1,13 +1,16 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://struts.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://www.nuzmsh.ru/tags/msh" prefix="msh" %>
 <%@ taglib uri="http://www.ecom-ast.ru/tags/ecom" prefix="ecom" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 <tiles:insert page="/WEB-INF/tiles/mainLayout.jsp" flush="true">
+    <tiles:put name="title" type="string">
+        <ecom:titleTrail mainMenu="Expert2" beginForm="e2_entryForm" />
+    </tiles:put>
 
     <tiles:put name="body" type="string">
         <tags:E2ServiceAdd name="Diagnosis"/>
-        <msh:form action="/entityParentSaveGoView-e2_entry.do" defaultField="lastname" guid="05d29ef5-3f3c-43b5-bc22-e5d5494c5762">
+        <msh:form action="/entityParentSaveGoView-e2_entry.do" defaultField="lastname">
             <msh:hidden property="id" />
             <msh:hidden property="saveType" />
             <msh:hidden property="listEntry" />
@@ -16,8 +19,6 @@
             <msh:hidden property="KLADRReal" />
             <msh:hidden property="okatoReg" />
             <msh:hidden property="okatoReal"/>
-            <msh:hidden property="addressRegistration" />
-            <msh:hidden property="addressReal"  />
             <msh:panel>
      <msh:separator colSpan="4" label="Общие"/>
                 <msh:row>
@@ -68,6 +69,13 @@
             <msh:row>
                 <msh:textField property="height" size="10" />
                 <msh:textField property="weigth" size="10" />
+            </msh:row>
+            <msh:row>
+                <msh:textField property="addressRegistration" size="50" />
+                <msh:textField property="addressReal" size="50" />
+            </msh:row>
+            <msh:row>
+                <msh:textField property="birthPlace" size="50" />
             </msh:row>
     <msh:separator colSpan="4" label="Представитель"/>
                 <msh:row>
@@ -283,9 +291,13 @@
                     </msh:row><msh:row>
                     <msh:textField property="extDispHealthGroup" size="50" />
                     <msh:textField property="extDispSocialGroup" size="50" />
-            </msh:row><msh:row>
+                </msh:row>
+                <msh:row>
                 <msh:textField property="extDispAppointments" size="50" />
                     <msh:checkBox property="extDispNextStage"  />
+                </msh:row>
+                <msh:row>
+                    <msh:autoComplete property="dispResult" vocName="vocE2FondV017" fieldColSpan="3" size="100" />
                 </msh:row>
 
     <msh:separator colSpan="4" label="Служебная информация"/>
@@ -302,7 +314,7 @@
                     <msh:textField property="externalParentId" size="50" />
                 </msh:row>
 
-                <msh:submitCancelButtonsRow guid="submitCancel" colSpan="1" />
+                <msh:submitCancelButtonsRow colSpan="1" />
             </msh:panel>
         </msh:form>
         <msh:ifFormTypeIsView formName="e2_entryForm">
@@ -348,17 +360,25 @@
             </msh:section>
 
             <msh:separator colSpan="4" label="Услуги по случаю"/>
-                <ecom:webQuery name="servicesList" nativeSql="select ms.id, vms.code ||' '|| coalesce(vms.name,'Нет наименования')
+                <ecom:webQuery name="servicesList" nativeSql="select ms.id, coalesce(vms.code ||' '|| coalesce(vms.name,'Нет наименования')||coalesce(' ('|| ms.comment||')',''),'Нет услуги '||ms.comment) as f2
                 , ms.serviceDate as name
                 ,ms.doctorsnils as dsnils
-                from entryMedService ms left join VocMedService vms on vms.id=ms.medservice_id
+                ,ms.cost as f5_cost
+                ,case when ms.medservice_id is null then 'color: red'
+                  when ms.comment!='' then 'color: #8B4513' else '' end as f6_styleRow
+                  ,v021.code as f7_doctorWf
+                from entryMedService ms
+                left join VocMedService vms on vms.id=ms.medservice_id
+                left join voce2fondv021 v021 on v021.id=ms.doctorspeciality_id
                      where ms.entry_id=${param.id}"/>
-                <msh:table idField="1" name="servicesList" action="jabascript:void()" noDataMessage="Нет услуг по случаю"
+                <msh:table idField="1" styleRow="6" name="servicesList" action="jabascript:void()" noDataMessage="Нет услуг по случаю"
                            deleteUrl="entityParentDeleteGoParentView-e2_entryMedService.do" >
                     <msh:tableColumn columnName="ИД" property="1"/>
                     <msh:tableColumn columnName="Услуга" property="2"/>
                     <msh:tableColumn columnName="Дата оказания" property="3"/>
                     <msh:tableColumn columnName="СНИЛС" property="4"/>
+                    <msh:tableColumn columnName="Должность" property="7"/>
+                    <msh:tableColumn columnName="Цена" property="5"/>
                 </msh:table>
 
             <msh:separator colSpan="4" label="Сложности лечения пациента"/>
@@ -385,7 +405,7 @@ where cancer.entry_id=${param.id}"/>
             <ecom:webQuery name="sanctionList" nativeSql="select es.dopcode , coalesce(es.comment,'')
             , case when es.ismainDefect='1' then 'background-color:red' else '' end as f3_style
   from e2entrysanction es
-  where es.entry_id=${param.id} and es.isDeleted='0'"/>
+  where es.entry_id=${param.id} "/>
             <msh:tableNotEmpty  name="sanctionList"  >
                 <msh:table  idField="1" name="sanctionList" styleRow="3" action="/javascript:void()" >
                 <msh:tableColumn columnName="Код" property="1"/>
@@ -393,20 +413,46 @@ where cancer.entry_id=${param.id}"/>
                 </msh:table>
             </msh:tableNotEmpty>
             </msh:section>
+
+            <msh:section title="Особенности случая">
+                <msh:autoComplete label="Добавить особенность" property="newFactor" vocName="vocE2EntryFactor" /><input type="button" value="Д. фактор" onclick="addOrDeleteEntryFactor($('newFactor').value,false)">
+            <ecom:webQuery name="factorList" nativeSql="select ef.factor_id, vef.code ||' '|| vef.name
+            from e2entry_factor ef
+            left join VocE2EntryFactor vef on vef.id=ef.factor_id
+  where ef.entry_id=${param.id} "/>
+            <msh:tableNotEmpty  name="factorList"  >
+                <msh:table idField="1" name="factorList" action="javascript:deleteEntryFactor" >
+                <msh:tableColumn columnName="Фактор" property="2"/>
+                </msh:table>
+            </msh:tableNotEmpty>
+            </msh:section>
         </msh:ifFormTypeIsView>
 
     </tiles:put>
-    <tiles:put name="title" type="string">
-        <ecom:titleTrail mainMenu="Expert2" beginForm="e2_entryForm" guid="fbc3d5c0-2bf8-4584-a23f-1e2389d03646" />
-    </tiles:put>
+
     <tiles:put name="javascript" type="string">
         <msh:ifFormTypeAreViewOrEdit formName="e2_entryForm">
             <script type="text/javascript" src="./dwr/interface/Expert2Service.js"></script>
         <msh:ifFormTypeIsView formName="e2_entryForm">
 
                 <script type="text/javascript">
-                    String.prototype.replaceAt=function(index, replacement) {
-                        return this.substr(0, index) + replacement+ this.substr(index + replacement.length);
+
+                    function deleteEntryFactor(factor) {
+                        addOrDeleteEntryFactor(factor,true);
+                    }
+
+                    function addOrDeleteEntryFactor(factor, isDelete) {
+                        if (+factor>0) {
+                            Expert2Service.addDeleteEntryFactor(${param.id}, factor ,isDelete , {
+                                callback: function () {
+                                    window.document.location.reload();
+                                }
+                            });
+                        }
+                    }
+
+                    String.prototype.replaceAt=function(iFrom, iTo, replacement) {
+                        return this.substr(0, iFrom+1) + replacement+ this.substr((iTo-1) + replacement.length);
                     };
 
                     function splitLongCase() {
@@ -439,8 +485,7 @@ where cancer.entry_id=${param.id}"/>
             }
             function makeMPFromRecord() {
                 //Long aEntryListId, String aType, String aBillNumber, String aBillDate, Long aEntryId,
-                var ver = "3.1.1";
-                if (confirm("2020?")) ver = "3.2";
+                var ver = "3.2";
                 Expert2Service.makeMPFIle(null,$('entryType').value,$('billNumber').value, $('billDate').value
                     ,${param.id},false,ver,$('fileType').value,{
                     callback: function (monitorId) {
@@ -471,7 +516,8 @@ where cancer.entry_id=${param.id}"/>
                                     if (aStatus.finish) {
                                         txt="Завеpшено!";
                                         if (aStatus.finishedParameters) {
-                                            var hName =  aStatus.finishedParameters.replace(".MP",".xml");hName=hName.replaceAt(16,"H");
+                                            var hName =  aStatus.finishedParameters.replace(".MP",".xml");
+                                            hName=hName.replaceAt(hName.lastIndexOf('/'),hName.indexOf('M30'),'H');
                                             //var hName =  filename.replace(".MP",".xml");hName=hName.replaceAt(16,"H");
                                             window.open("http://"+window.location.host+""+hName);
                                             //txt+=" <a href='"+aStatus.finishedParameters+"'>ПЕРЕЙТИ</a>";
@@ -533,8 +579,8 @@ where cancer.entry_id=${param.id}"/>
     </tiles:put>
 
     <tiles:put name="side" type="string">
-        <msh:ifFormTypeIsView formName="e2_entryForm" guid="22417d8b-beb9-42c6-aa27-14f794d73b32">
-            <msh:sideMenu guid="32ef99d6-ea77-41c6-93bb-aeffa8ce9d55">
+        <msh:ifFormTypeIsView formName="e2_entryForm">
+            <msh:sideMenu>
                 <msh:sideLink action="/javascript:window.history.back()" name="Назад" roles="/Policy/E2/Edit" />
                  <%--<msh:IfPropertyIsFalse formName="some_shit" propertyName="doNotSend">--%>
                 <msh:sideLink params="id" action="/entityParentEdit-e2_entry" name="Изменить" roles="/Policy/E2/Edit" />

@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -316,7 +317,7 @@ public class PrescriptionServiceJs {
 	}
 
 	public String createVisitByPrescription(Long aPrescriptListId, Long aWorkFunctionPlanId,  
-		Long aDatePlanId, Long aTimePlanId, Long aMedServiceId,Long aCountDays, HttpServletRequest aRequest )throws NamingException {
+		Long aDatePlanId, Long aTimePlanId, Long aMedServiceId,Long aCountDays, Long aGuaranteeId, HttpServletRequest aRequest )throws NamingException {
 		if (aTimePlanId==null || aTimePlanId.equals(0L)) {return "";}
 		IPrescriptionService service = Injection.find(aRequest).getService(IPrescriptionService.class) ;
 		IWebQueryService wqs = Injection.find(aRequest).getService(IWebQueryService.class) ;
@@ -353,11 +354,11 @@ public class PrescriptionServiceJs {
 				 aTimePlanId = Long.parseLong(r.get1().toString());
 				 aDatePlanId = Long.parseLong(r.get2().toString());
 				 visit = service.createNewDirectionFromPrescription(aPrescriptListId, aWorkFunctionPlanId
-							,aDatePlanId, aTimePlanId, aMedServiceId, username, wf);
+							,aDatePlanId, aTimePlanId, aMedServiceId, username, wf,aGuaranteeId);
 			}
 		} else {
 			visit = service.createNewDirectionFromPrescription(aPrescriptListId, aWorkFunctionPlanId
-					,aDatePlanId, aTimePlanId, aMedServiceId, username, wf);
+					,aDatePlanId, aTimePlanId, aMedServiceId, username, wf, aGuaranteeId);
 		}
 		return visit;
 	}
@@ -618,15 +619,93 @@ public class PrescriptionServiceJs {
 		reasonText += StringUtil.isNullOrEmpty(aReason) ? "" : " "+aReason;
 		IPrescriptionService bean = Injection.find(aRequest).getService(IPrescriptionService.class);
 		JSONObject res = getPrescriptionInfo(aPrescripts, service);
-		StringBuilder msgTitle=new StringBuilder();
-		msgTitle.append(res.getString("date")).append(" пациент ").append(res.getString("patFio")).append(" услуга ").append(res.getString("medService"));
-		for (int i=0; i<2; i++)
-			bean.sendMessageCurrentDate("Брак биоматериала: "+reasonText,msgTitle.toString(),res.getString("usernameO"),username
-					,"entityView-pres_prescriptList.do?id="+res.get("plId"),i<1);
+		String lpuString = getLpuForDefectMessage(aPrescripts,aRequest);
+		if (!lpuString.equals("0")) {
+            ArrayList<String> usersToSend = getAllUsersToSendMessageCancel(lpuString,aPrescripts,aRequest);
+			String msgTitle=res.getString("date")+" пациент "+res.getString("patFio")+" услуга "+res.getString("medService");
+            String messageText = "Брак биоматериала: "+reasonText;
+            String sender = res.getString("usernameO"); //спорно, ну да пофиг
+            for (String user : usersToSend) {
+                for (int i=0; i<2; i++){
+                	LOG.info("dbg. send brak "+i+", user="+user+", sender="+sender); //Сообщение уходят по 4 раза вместо двух
+					bean.sendMessageCurrentDate(messageText,msgTitle,user, sender
+							,"entityView-pres_prescriptList.do?id="+res.get("plId"),i<1);
+				}
+            }
+        }
 		//Обновление текста дневника в случае отметки о браке после подтверждения врачом КДЛ
 		String wfCnsl = bean.getRealLabTechUsername(Long.valueOf(aPrescripts.split(",")[0]),"");
 		updateDiaryWhileCancelPrescription(null,aPrescripts,"Брак биоматериала: "+reasonText,wfCnsl,service);
 	}
+
+	/* Получить всех пользователей для отправки сообщения о браке
+	 * @param lpu Список отделений через запятую для запроса (выборка только с ролью Специалист стационара - врачи)
+	 * @param aPrescripts Список назначений через запятую (выборка только с той же должностью, что и назначивший исследования)
+	 * @param aRequest
+	 * @return ArrayList Список пользователей
+	 * @throws NamingException
+	 * */
+	private ArrayList<String> getAllUsersToSendMessageCancel(String lpu, String aPrescripts, HttpServletRequest aRequest) throws NamingException {
+		ArrayList<String> resListUsers = new ArrayList<>();
+		IWebQueryService service = Injection.find(aRequest).getService(IWebQueryService.class) ;
+		StringBuilder sql = new StringBuilder();
+		sql.append(" select distinct su.login")
+				.append(" from workfunction wf1")
+				.append(" left join worker w1 on w1.id=wf1.worker_id")
+				.append(" left join worker w on w.lpu_id=w1.lpu_id")
+				.append(" left join workfunction wfDep on wfDep.worker_id = w.id and wfDep.workfunction_id  = wf1.workfunction_id and (wfDep.archival is null or wfDep.archival ='0')")
+				.append(" left join worker wall on wall.id  = wfDep.worker_id")
+				.append(" left join worker wall2 on wall2.person_id = wall.person_id")
+				.append(" left join workfunction  wfall2 on wfall2.worker_id  = wall2.id")
+				.append(" left join secuser su on su.id=wfall2.secuser_id");
+		if (lpu.split(",").length > 1) { //если был перевод (СЛО1-СЛО2)
+			sql.append(" left join secuser_secrole sur on sur.secuser_id=su.id")
+					.append(" left join secrole sr on sr.id=sur.roles_id")
+					.append(" where w.lpu_id in (").append(lpu).append(")")
+					.append(" and su.id is not null")
+					.append(" group by su.login,sr.id having (sr.id=1)");
+		}
+		else { //если перевода не было и всё в одном отделении (приёмник-СЛО или просто в СЛО)
+			sql.append(" where wf1.id=ANY(select prescriptspecial_id from prescription where id in (").append(aPrescripts)
+				.append(")) and su.id is not null");
+		}
+		Collection<WebQueryResult> listUsers = service.executeNativeSql(sql.toString()) ;
+		for (WebQueryResult wqr : listUsers)
+			resListUsers.add(wqr.get1().toString());
+		return resListUsers;
+	}
+
+    /* Получить отделения, пользователям которых надо отправить сообщение о браке назначения
+     * @param aPrescripts Назначения
+     * @param aRequest
+     * @return String Отделения через запятую
+     * @throws NamingException
+     * */
+	private String getLpuForDefectMessage(String aPrescripts, HttpServletRequest aRequest) throws NamingException {
+        IWebQueryService service = Injection.find(aRequest).getService(IWebQueryService.class) ;
+        StringBuilder sql = new StringBuilder() ;
+        /*
+        Если ЛН сделан в приёмнике, то, если создан СЛО, вернуть ЛПУ последнего СЛО
+        Если нет СЛО (это мб в случае отказа от госпитализации или ещё не создали)
+        то никому - вернуть 0.
+        Если ЛН сделан в СЛО, то, если нет перевода, вернуть ЛПУ этого СЛО
+        Если есть перевод, вернуть через запятую ЛПУ изначального СЛО и перевода.
+        * */
+        sql.append("select case when mc.dtype='HospitalMedCase' then")
+                .append(" case when cast((select max(id) from medcase")
+                .append(" where dtype='DepartmentMedCase' and parent_id=mc.id) as varchar) is null then '0'")
+                .append(" else cast((select department_id from medcase where dtype='DepartmentMedCase' and parent_id=mc.id and id=(select max(id) from medcase")
+				.append(" where dtype='DepartmentMedCase' and parent_id=mc.id)) as varchar) end")
+				.append(" else case when mc.dtype='DepartmentMedCase' then")
+                .append(" case when mc.transferdepartment_id is null then cast (mc.department_id as varchar)")
+                .append(" else cast(mc.department_id as varchar)||','||cast(mc.transferdepartment_id as varchar) end end end")
+                .append(" from prescription p")
+                .append(" left join prescriptionlist pl on pl.id=p.prescriptionlist_id")
+                .append(" left join medcase mc on mc.id=pl.medcase_id")
+                .append(" where p.id in (").append(aPrescripts).append(")");
+        Collection<WebQueryResult> list = service.executeNativeSql(sql.toString());
+        return list.isEmpty() ? "0": list.iterator().next().get1().toString();
+    }
 
 	/* Отметка патологии назначений. Заполняет поля о том, кто и когда поставил патологию
 	 * @param aPrescriptId ИД назначения
@@ -681,7 +760,7 @@ public class PrescriptionServiceJs {
 	 * @throws NamingException
 	 * */
 	private JSONObject getPrescriptionInfo(String aPrescripts,IWebQueryService service) throws NamingException {
-		JSONObject res = new JSONObject();
+		JSONObject res = new JSONObject(); //TODO возвращает информация только по первому анализу.
 		List<Object[]> list = service.executeNativeSqlGetObj("select pat.id as patId,p.createusername,to_char(p.planstartdate,'dd.mm.yyyy')  as dt " +
 				" ,pat.lastname||' '||pat.firstname||' '||pat.middlename as fio,ms.code||' '||ms.name,pl.id as plId, hmc.id as mcId " +
 				" from prescription p " +
@@ -691,8 +770,7 @@ public class PrescriptionServiceJs {
 				" left join patient pat on pat.id=mc.patient_id " +
 				" left join medcase hmc on hmc.id=case when mc.dtype='DepartmentMedCase' then mc.parent_id else mc.id end" +
 				" where p.id in("+aPrescripts+")") ;
-		if (!list.isEmpty()) {
-			Object[] obj = list.get(0);
+		for (Object[] obj : list) {
 			res.put("usernameO","" + obj[1])
 					.put("patId",obj[0])
 					.put("date",obj[2])
@@ -927,8 +1005,8 @@ public class PrescriptionServiceJs {
 		ret.append("<table>") ;
 		for (WebQueryResult wqr:l) {			
 			ret.append("<tr>") ;
-			ret.append("<td onclick=\"this.childNodes[1].checked=\'checked\';this.childNodes[1].onchange()\" colspan=\"4\">");
-    		ret.append("	<input name=\"typeDefect\" value=\"5\" type=\"radio\" onchange=\"cancel").append(aPrefixMethod).append("InLab('").append(aPrescript).append("','").append(wqr.get1()).append("','").append(wqr.get3() != null ? "1" : "0").append("')\">  ").append(wqr.get2());
+			ret.append("<td onclick=\"cancel").append(aPrefixMethod).append("InLab('").append(aPrescript).append("','").append(wqr.get1()).append("','").append(wqr.get3() != null ? "1" : "0").append("');\" colspan=\"4\">");
+    		ret.append("	<input name=\"typeDefect\" value=\"5\" type=\"radio\">").append(wqr.get2());
     		ret.append("</td>") ;
     		ret.append("</tr>") ;
 		}
@@ -1300,6 +1378,7 @@ public class PrescriptionServiceJs {
 	 * Подтверждение выполнения лабораторного анализа
 	 * @param aSmoId - ИД 'визита' к врачу лаборатории
 	 * @param aProtocol ИД дневника врача-лаборанта
+	 * @param aPrescriptId ИД назначения
 	 * @param aRequest -
 	 * @return
 	 * @throws NamingException
@@ -1330,6 +1409,34 @@ public class PrescriptionServiceJs {
 		service.executeUpdateNativeSql("update ContractAccountOperationByService set medCase_id="+aSmoId+
 				" where serviceType='PRESCRIPTION' and serviceId in (select id from Prescription where medCase_id = "+aSmoId+")");
 
+	// проставляем информацию о выполненной услуги для ДМС в CAMS
+		sql = new StringBuilder();
+		sql.append("select pat.id as patientId, cg.id as letterId, ms.code as serviceCode" +
+				" from prescription p" +
+				" left join prescriptionlist pl on pl.id=p.prescriptionlist_id" +
+				" left join medcase slo on slo.id = pl.medcase_id" +
+				" left join medcase sls on sls.id = slo.parent_id" +
+				" left join vocservicestream vss on vss.id=slo.servicestream_id" +
+				" left join contractguarantee cg on cg.id=coalesce(sls.guarantee_id, slo.guarantee_id)" +
+				" left join medservice ms on ms.id=p.medservice_id" +
+				" left join patient pat on pat.id=coalesce(sls.patient_id, slo.patient_id)" +
+				" where p.id= "+aPrescriptId+" and vss.iscalcdogovor='1' and cg.id is not null");
+		IContractService contractService =  Injection.find(aRequest).getService(IContractService.class) ;
+		Collection<WebQueryResult> guaranteeList = service.executeNativeSql(sql.toString());
+		if (!guaranteeList.isEmpty()) {
+			LOG.info("find guarantee!! sql = "+sql);
+			//String typeService, Long idService, String medServiceCode, Long patientId, ContractGuarantee letter
+			WebQueryResult guarantee = guaranteeList.iterator().next();
+			String typeService ="PRESCRIPTION";
+			contractService.addMedServiceAccount(typeService,aPrescriptId,guarantee.get3().toString()
+					,Long.parseLong(guarantee.get1().toString()), Long.parseLong(guarantee.get2().toString()));
+
+
+		} else {
+			LOG.info("GGGG not found");
+		}
+
+
 		createEmergencyReferenceMsg(aProtocol,aPrescriptId,aRequest);
 	}
 
@@ -1340,7 +1447,7 @@ public class PrescriptionServiceJs {
 	 * @param aPrescriptId Prescription.id
 	 * @param aRequest HttpServletRequest
 	 */
-	public void createEmergencyReferenceMsg(Long aDiaryId, Long aPrescriptId, HttpServletRequest aRequest) throws NamingException {
+	private void createEmergencyReferenceMsg(Long aDiaryId, Long aPrescriptId, HttpServletRequest aRequest) throws NamingException {
 		IPrescriptionService bean = Injection.find(aRequest).getService(IPrescriptionService.class);
 		bean.sendEmergencyReferenceMsg(aDiaryId,aPrescriptId);
 	}

@@ -1076,13 +1076,7 @@ and mc.dateFinish <= to_date('${dateEnd}','dd.mm.yyyy')
         %>
         <script type='text/javascript'>
             function find() {
-                var from = $('dateBegin').value.split(".");
-                var d1 = new Date(from[2], from[1] - 1, from[0]);
-                var d2=new Date(2017, 11, 1);
-                if(d1<d2) {
-                    alert("Работа с 203 приказом началась с 1 декабря, раньше этого периода отчётности нет!");
-                    $('dateBegin').value="01.12.2017";
-                } else {
+                if (okDate()) {
                     var frm = document.forms[0];
                     frm.target = '';
                     frm.action = 'report203.do';
@@ -1102,6 +1096,9 @@ and mc.dateFinish <= to_date('${dateEnd}','dd.mm.yyyy')
                 document.getElementById('chbShow2').checked=true;
             if (window.location.href.indexOf('chbShow3=on')!=-1)
                 document.getElementById('chbShow3').checked=true;
+            var tbls = document.getElementsByTagName('table'); //все таблицы страницы
+            if (tbls[0].id.indexOf('claimMessageContainer')!=-1)
+                tbls[0].remove()
             checkBox(2);
             checkBox(3);
         </script>
@@ -3066,15 +3063,17 @@ order by pat.lastname||' '||pat.firstname||' '||pat.middlename
     }
 %>
 <script type="text/javascript">
-    eventutil.addEventListener($('dateBegin'), "blur",
-    function() {
+    function okDate() {
         var from = $('dateBegin').value.split(".");
         var d1 = new Date(from[2], from[1] - 1, from[0]);
-        var d2=new Date(2017, 11, 1);
-        if(d1<d2) {
+        var d2 = new Date(2017, 11, 1);
+        if (d1 < d2) {
             alert("Работа с 203 приказом началась с 01.12.2017, раньше этого периода отчётности нет!");
-            $('dateBegin').value="01.12.2017";
+            $('dateBegin').value = "01.12.2017";
+            return false;
         }
-    }) ;
+        return true;
+    }
+    eventutil.addEventListener($('dateBegin'), "blur",okDate()) ;
 
 </script>

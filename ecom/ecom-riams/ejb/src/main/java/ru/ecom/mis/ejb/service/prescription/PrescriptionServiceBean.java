@@ -12,6 +12,7 @@ import ru.ecom.ejb.sequence.service.SequenceHelper;
 import ru.ecom.ejb.services.entityform.ILocalEntityFormService;
 import ru.ecom.ejb.services.live.domain.CustomMessage;
 import ru.ecom.ejb.services.util.ConvertSql;
+import ru.ecom.mis.ejb.domain.contract.ContractGuarantee;
 import ru.ecom.mis.ejb.domain.lpu.MisLpu;
 import ru.ecom.mis.ejb.domain.medcase.*;
 import ru.ecom.mis.ejb.domain.patient.ColorIdentityPatient;
@@ -36,8 +37,6 @@ import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.io.File;
-import java.io.FilenameFilter;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.text.DecimalFormat;
@@ -229,7 +228,7 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 	        s.append(" end");
 	        return s.toString();
 	    }
-	 
+
 	private String str(String aValue) {
     	if (aValue.contains("\"")) {
     		aValue = aValue.replaceAll("\"", "\\\\\"") ;
@@ -239,7 +238,7 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 
 	public Long clonePrescription(Long aPrescriptionId, Long aMedServiceId, Long aWorkFunctionId, String aCreateUsername) {
 		ServicePrescription p = theManager.find(ServicePrescription.class, aPrescriptionId);
-		
+
 		Long ret = null;
 		if (p!=null) { //Дублируем лаб. назначение (для бак. лаборатории)
 			WorkFunction workFunction = theManager.find(WorkFunction.class, aWorkFunctionId);
@@ -250,13 +249,13 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 			presNew.setCreateDate(new java.sql.Date(currentDate));
 			presNew.setPrescriptionList(presOld.getPrescriptionList());
 			presNew.setPlanStartDate(presOld.getPlanStartDate());
-			presNew.setPrescriptSpecial(workFunction); 
+			presNew.setPrescriptSpecial(workFunction);
 			presNew.setMedService(medService);
 			presNew.setCreateTime(new java.sql.Time(currentDate));
 			presNew.setCreateUsername(aCreateUsername);
 			presNew.setPrescriptType(presOld.getPrescriptType());
 			presNew.setIntakeDate(presOld.getIntakeDate());
-			
+
 			presNew.setIntakeTime(presOld.getIntakeTime());
 			presNew.setIntakeUsername(presOld.getIntakeUsername());
 			presNew.setMaterialId(presOld.getMaterialId());
@@ -278,7 +277,8 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 		}
 		return ret;
 	}
-	public String createNewDirectionFromPrescription(Long aPrescriptionListId, Long aWorkFunctionPlanId, Long aDatePlanId, Long aTimePlanId, Long aMedServiceId, String aUsername, Long aOrderWorkFunction) {
+	public String createNewDirectionFromPrescription(Long aPrescriptionListId, Long aWorkFunctionPlanId, Long aDatePlanId
+			, Long aTimePlanId, Long aMedServiceId, String aUsername, Long aOrderWorkFunction, Long aGuaranteeId) {
 		MedService sms = theManager.find(MedService.class, aMedServiceId);
 		if (sms!=null) {
 			long date = new java.util.Date().getTime() ;
@@ -301,7 +301,7 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 				}
 				VocWorkPlaceType wpt = (VocWorkPlaceType) theManager.createQuery("from VocWorkPlaceType where code=:code").setParameter("code", "POLYCLINIC").getSingleResult();
 				vis.setWorkPlaceType(wpt) ;
-
+				if (aGuaranteeId!=null && aGuaranteeId>0L) vis.setGuarantee(theManager.find(ContractGuarantee.class,aGuaranteeId));
 				vis.setPatient(pat);
 				vis.setCreateDate(new java.sql.Date(date));
 				vis.setCreateTime(new java.sql.Time(date));
@@ -662,7 +662,7 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 
     public Long checkLabAnalyzed(Long aPrescriptId,Long aWorkFunctionId,String aUsername) {
 		StringBuilder sql = new StringBuilder() ;
-		sql.append("select pat.id as patid,case when slo.dtype='DepartmentMedCase' then sls.id") ; 
+		sql.append("select pat.id as patid,case when slo.dtype='DepartmentMedCase' then sls.id") ;
 		sql.append(" when slo.dtype='Visit' then coalesce (sls.id,slo.id) else slo.id end as pmo") ;
 		sql.append(" ,p.prescriptSpecial_id as presspec") ;
 		sql.append(" ,p.prescriptCabinet_id as cabinet") ;
@@ -721,8 +721,8 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 		} else {
 			return checkLabAnalyzed(aPrescriptId,ConvertSql.parseLong(wf.get(0)), aUsername) ;
 		}
-		
-		
+
+
 	}
 	public Long createTempPrescriptList(String aName,String aComment,String aCategories,String aSecGroups) {
 		PrescriptListTemplate temp = new PrescriptListTemplate() ;
@@ -731,7 +731,7 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 		theManager.persist(temp) ;
 		return temp.getId() ;
 	}
-	
+
 	public void setPatientDateNumber(String aPrescriptions, String aDate, String aTime, String aUsername, Long aSpecId) throws ParseException {
 		SimpleDateFormat sdfIn =new SimpleDateFormat("dd.MM.yyyy") ;
 		SimpleDateFormat sdfOut =new SimpleDateFormat("yyyy-MM-dd") ;
@@ -750,13 +750,13 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 				aLabMap.put(aKey, matId);
 				p.setMaterialId(matId);
 				theManager.persist(p);
-			} 		
+			}
 		}
-		
+
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param aLabMap - карта (Ключ = ИД пациента+дата назначения)
 	 * @param aKey - Ключ = ИД пациента+дата назначения
 	 * @param aPatientId - ИД пациента
@@ -779,10 +779,10 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 									"and p.canceldate is null " +
 									"and p.materialId!='' order by p.materialId desc ";
 			List<String> lPl = aManager.createNativeQuery(req).getResultList();
-			
+
 			if (!lPl.isEmpty()) {
 				matId = ""+lPl.get(0) ;
-			}  
+			}
 			if (matId == null || matId.equals("")) {
 				SequenceHelper seqHelper = SequenceHelper.getInstance() ;
 				matId=seqHelper.startUseNextValueNoCheck("Prescription#Lab#"+aDate,"", aManager);
@@ -790,7 +790,7 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 		}
 		return matId;
 	}
-	
+
 	/**
 	 * Получить описание шаблона листа назначения
 	 * @param aIdTemplateList - ИД листа назначения
@@ -800,7 +800,7 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 		PrescriptListTemplate template = theManager.find(PrescriptListTemplate.class, aIdTemplateList);
 		if (template==null) return "";
 		StringBuilder description = new StringBuilder();
-		description.append("Название шаблона: ") ; 
+		description.append("Название шаблона: ") ;
 		description.append(template.getName());
 		description.append('\n');
 		description.append("Комментарии: ");
@@ -833,49 +833,49 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 		addPrescription(template,listPresc,WorkerServiceBean.getWorkFunction(theContext, theManager)) ;
 		return true ;
 	}
-	
+
 	/** Проверка на возможность создавать направление с типом "экстренно".
 	 * @param aId - ИД листа назначения либо СМО
 	 * @return true - может быть создано назначение с типом "экстренно"
 	 */
 	public boolean checkMedCaseEmergency(Long aId, String idType) {
 		boolean isEmergency =false ;
-		
+
 		SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd-hh:mm:ss") ;
 		String sqlquery = "select mc.datestart || '-' || mc.entrancetime as datetime " +
 				" ,case when mc.emergency='1' then '1' when mcs.emergency='1' then '1' else null end as caseEmergency " +
 				" from medCase mc " +
 				" left join medcase mcs on mcs.id = mc.parent_id ";
-				
+
 		if (idType.equals("prescriptionList")) {
 			sqlquery+=" left join prescriptionList pl on pl.medcase_id = mc.id " +
 					" where pl.id ='"+aId+"' and (mcs.dtype='HospitalMedCase' or mc.dtype='HospitalMedCase') ";
 		} else if (idType.equals("medCase")) {
 			sqlquery+=" where mc.id ='"+aId+"' and (mcs.dtype='HospitalMedCase' or mc.dtype='HospitalMedCase')";
 		} else {
-			return false; 
+			return false;
 		}
 		List<Object[]> list = theManager.createNativeQuery(sqlquery).getResultList() ;
 		if (!list.isEmpty()) {
 			Object[] obj = list.get(0);
-			
+
 			java.util.Date date;
 			try {
 				date = sdf.parse(obj[0].toString());
 				boolean check = ru.ecom.mis.ejb.form.medcase.hospital.interceptors.SecPolicy.isDateLessThenHour(date,2);
-				if (obj[1]!=null && check) { 
+				if (obj[1]!=null && check) {
 					isEmergency=true;
 				}
 			} catch (ParseException e) {
 				LOG.error(e);
-			}	
+			}
 		}
 		return isEmergency ;
 	}
 	/**
-	 * Получение списка назначений из шаблона в добавление их в лист назначений. 
+	 * Получение списка назначений из шаблона в добавление их в лист назначений.
 	 */
-	
+
 	public String getLabListFromTemplate(Long aIdTemplateList) {
 		PrescriptListTemplate template = theManager.find(PrescriptListTemplate.class, aIdTemplateList);
 		StringBuilder labList = new StringBuilder();
@@ -885,7 +885,7 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 		if (template.getComments()!=null&&template.getComments().length()>0) {
 			labList.append("COMMENT@").append(template.getComments()).append("#");
 		}
-		 
+
 		return labList.length()>0?labList.substring(0, labList.length()-1):"";
 	}
 
@@ -904,10 +904,10 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 		for (Object[] o: list) {
 			res.append(o[0]).append(":").append(o[1]).append(":").append(o[2]).append("#");
 		}
-		
+
 		return res.length()>0?res.substring(0,res.length()-1):"";
 	}
-	
+
 	/**
 	 * Получение данных о назначении (для функции getLabListFromTemplate)
 	 * @param aPresc - ID назначения (шаблона)
@@ -934,7 +934,7 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 				list.append(presNew.getAmountUnit().getId()).append(":");
 				list.append(presNew.getAmountUnit().getName()).append(":");
 			} else list.append(":::");
-			
+
 			return list.toString() ;
 			}
 			catch (Exception e) {
@@ -963,7 +963,7 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 				list.append(presNew.getMedService().getServiceType().getCode()).append(":");
 				list.append(presNew.getMedService().getId()).append(":");
 				list.append(presNew.getMedService().getCode()).append(" ");
-				list.append(presNew.getMedService().getName()).append("::"); //: aLabDate 
+				list.append(presNew.getMedService().getName()).append("::"); //: aLabDate
 				list.append(presNew.getPrescriptCabinet()!=null?presNew.getPrescriptCabinet().getId():"").append(":");
 				list.append(presNew.getPrescriptCabinet()!=null?presNew.getPrescriptCabinet().getName():"").append(":");
 				list.append(presNew.getDepartment()!=null?presNew.getDepartment().getId():"").append(":");
@@ -979,17 +979,17 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 			list.append(prescNew.getModePrescription().getName()).append(":");
 			list.append(prescNew.getModePrescription().getId()).append("#");
 			return list.toString();
-		} 
+		}
 		LOG.error("_----------------Some shit happens!!!"+aPresc);
 		return "";
 	}
 	/**
-	 * Создаем шаблон листа назначений из существующего ЛН 
+	 * Создаем шаблон листа назначений из существующего ЛН
 	 */
 	public Long savePrescriptNew(Long aIdTemplateList, Long aIdParent) {
 		return savePrescriptNew(aIdTemplateList, aIdParent,null);
 	}
-	
+
 	/**
 	 * Добавить все назначения в новый лист
 	 * @param aIdTemplateList - ИД шаблона листа назначений
@@ -1004,7 +1004,7 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 		AbstractPrescriptionList list  ;
 		if (medCase!=null) {
 			 list = new PrescriptList() ;
-			
+
 			list.setMedCase(medCase) ;
 			list.setCreateDate(new java.sql.Date(new Date().getTime())) ;
 			list.setCreateUsername(theContext.getCallerPrincipal().toString());
@@ -1035,8 +1035,8 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 		}
 		return list.getId() ;
 	}
-	
-	private void addPrescription(AbstractPrescriptionList aTemplate, AbstractPrescriptionList aList, WorkFunction aSpecialist) {		
+
+	private void addPrescription(AbstractPrescriptionList aTemplate, AbstractPrescriptionList aList, WorkFunction aSpecialist) {
 		if (aTemplate!=null && aList!=null)  {
 			List<Prescription> listNew = aList.getPrescriptions() ;
 			if (listNew==null) listNew =new ArrayList<>() ;
@@ -1046,12 +1046,12 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 				prescNew.setPrescriptionList(aList) ;
 				listNew.add(prescNew);
 				theManager.flush() ;
-			}	
+			}
 			aList.setPrescriptions(listNew) ;
 			theManager.persist(aList) ;
 		}
 	}
-	
+
 	private String getDescrPerscriptions(PrescriptListTemplate aTemplate) {
 		StringBuilder desc = new StringBuilder() ;
 		List<Prescription> listPrescript =aTemplate.getPrescriptions() ;
@@ -1104,8 +1104,8 @@ public class PrescriptionServiceBean implements IPrescriptionService {
 		throw new IllegalStateException("Невозможно создать шаблон назначения по текущему назначению, неизвестен тип назначения!");
 	}
 
-		
-		@EJB ILocalEntityFormService 
+
+		@EJB ILocalEntityFormService
 		theEntityFormService ;
 	    @PersistenceContext
 	    EntityManager theManager ;

@@ -68,6 +68,27 @@ bottom: 5%;
 opacity: 0.6;
 padding: 10px;
 }
+
+.msgBox {
+    background-color: #ddd;
+    position: fixed;
+    bottom: 17%;
+    right: 1%;
+    opacity: 0.6;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.msgBox td {
+    text-align: left;
+}
+
+.msgBox td:hover {
+    text-align: left;
+    font-size: 14px;
+    color: #4682B4;
+}
+
 .instant_message { padding: 5px; font-size: 12px; font-family: Arial; visibility: hidden;
 position: absolute;
 width: 80%;
@@ -232,6 +253,8 @@ img {
     left: 10em ;
     margin: 0 ;
     padding: 0 ;
+    top: 3em;
+
 }
 
 #header ul#mainMenu li {
@@ -610,6 +633,7 @@ div.autocomplete table tr:hover td {
     font-size: 100% ;
     margin: 0 0 0.4em 0 ;
     color: #a00;
+    margin-top: 2.5em;
 }
 
 #content h1 span {

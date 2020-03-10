@@ -24,9 +24,7 @@ import java.sql.Time;
 @Entity
 @Comment("Рабочая функция")
 @AIndexes({
-	//@AIndex(properties="archival")
 	@AIndex(properties="workFunction")
-	//,@AIndex(properties={"archival","workFunction"})
 	,@AIndex(properties={"code"})
 })
 @Table(schema="SQLUser")
@@ -76,6 +74,7 @@ abstract public class WorkFunction extends BaseEntity {
 	public String getWorkFunctionInfo() {
 		return getName() ;
 	}
+
 	@Transient @Comment("Информация по коду ОМС врача")
 	public String getOmcCodeInfo() {
 		String ret="" ;

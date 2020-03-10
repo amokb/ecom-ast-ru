@@ -44,10 +44,8 @@ public class DepartmentMedCaseCreateInterceptor implements IParentFormIntercepto
     		if (parentSSL.getEmergency()!=null && parentSSL.getEmergency()) {
     			form.setEmergency(Boolean.TRUE) ;
     		}
-    		if (parentSSL.getDeniedHospitalizating()!=null) {
-                throw new IllegalStateException("При отказе в госпитализации нельзя заводить случай лечения в отделении") ;
-               
-    		}
+			if (parentSSL.getGuarantee()!=null) form.setGuarantee(parentSSL.getGuarantee().getId());
+
     		Object listDep = manager
     			.createNativeQuery("select count(*) from MedCase where parent_id = :parentId and DTYPE='DepartmentMedCase' ")
     			.setParameter("parentId", aParentId)
@@ -88,9 +86,6 @@ public class DepartmentMedCaseCreateInterceptor implements IParentFormIntercepto
 				if (!noCheckPregnancy && !isPregnancyExists(manager, prevMedCase) && !isMisbirthClassExists(manager, form.getPrevMedCase())) {
 					throw new IllegalStateException("Перевод из отделения невозможен, т.к.не заполнены данные по родам либо данные по выкидышу!");
 				}
-				/*if (!isMisbirthClassExists(manager, form.getPrevMedCase()) &&!isRobsonClassExists(manager, prevMedCase )) {
-					throw new IllegalStateException ("Перевод из отделения невозможен, т.к.не создана классификация Робсона!");
-				}*/
 			}
 		}
 	}
@@ -98,13 +93,13 @@ public class DepartmentMedCaseCreateInterceptor implements IParentFormIntercepto
 	private static boolean isDsO82(EntityManager aManager, Long aMedCaseId) {
 		if (aMedCaseId==null) {return true;}
 		DepartmentMedCase parentSLO = aManager.find(DepartmentMedCase.class, aMedCaseId) ;
-		if (parentSLO.getDepartment()!=null && parentSLO.getDepartment().getIsMaternityWard()!=null && parentSLO.getDepartment().getIsMaternityWard()){
+		if (parentSLO.getDepartment()!=null && Boolean.TRUE.equals(parentSLO.getDepartment().getIsMaternityWard())){
 			String sql = "select count(idc.id) from vocidc10 idc" +
 					" left join diagnosis ds on ds.idc10_id=idc.id" +
 					" left join medcase mc on mc.id=ds.medcase_id" +
 					" where idc.code like 'O82%' and mc.id=:medcase";
 			Object list = aManager.createNativeQuery(sql).setParameter("medcase",aMedCaseId).getSingleResult();
-			return Long.valueOf(list.toString())>0;
+			return Long.parseLong(list.toString())>0;
 		} else {
 			return true;
 		}
@@ -129,7 +124,7 @@ public class DepartmentMedCaseCreateInterceptor implements IParentFormIntercepto
 		if (aMedCase.getDepartment()!=null && aMedCase.getDepartment().getIsMaternityWard()!=null && aMedCase.getDepartment().getIsMaternityWard()){
 			String sql = "select count(id) from robsonclass where medcase_id= "+aMedCase.getId();
 			Object list = aManager.createNativeQuery(sql).getSingleResult();
-			return Long.valueOf(list.toString())>0;
+			return Long.parseLong(list.toString())>0;
 		} else {
 			return true;
 		}
@@ -141,7 +136,7 @@ public class DepartmentMedCaseCreateInterceptor implements IParentFormIntercepto
 		if (parentSLO.getDepartment()!=null && parentSLO.getDepartment().getIsMaternityWard()!=null && parentSLO.getDepartment().getIsMaternityWard()){
 			String sql = "select count(id) from misbirth where medcase_id=:medcaseId";
 			Object list = aManager.createNativeQuery(sql).setParameter("medcaseId",aMedCaseId).getSingleResult();
-			return Long.valueOf(list.toString())>0;
+			return Long.parseLong(list.toString())>0;
 		} else {
 			return true;
 		}
@@ -158,6 +153,13 @@ public class DepartmentMedCaseCreateInterceptor implements IParentFormIntercepto
 		withoutChildBirth.add("O47.0");
 		withoutChildBirth.add("O47.1");
 		withoutChildBirth.add("O42.2");
+		withoutChildBirth.add("O44.0");
+		withoutChildBirth.add("O44.1");
+		withoutChildBirth.add("O45.8");
+		withoutChildBirth.add("O45.9");
+		withoutChildBirth.add("O14.0");
+		withoutChildBirth.add("O14.1");
+		withoutChildBirth.add("O14.9");
 		return withoutChildBirth;
 	}
 

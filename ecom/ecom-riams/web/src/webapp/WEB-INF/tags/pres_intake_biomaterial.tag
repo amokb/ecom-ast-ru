@@ -119,6 +119,7 @@
 			}
 		}
 	    function cancel${name}InLab(aId,aReasonId,aReason) {
+            $('BioIntakeRootPane').setAttribute("hidden",true);
 	    	aReason = get${name}Reason(aReason) ;
 	    	if (aReason!=null) {
 	        	PrescriptionService.cancelService(aId,aReasonId,aReason, {
@@ -127,6 +128,7 @@
 		            }
 				});
 	    	} else {
+                $('BioIntakeRootPane').removeAttribute("hidden");
 	    		cancelBioIntakeInfo();
 	    	}	
 		}

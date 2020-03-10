@@ -1,15 +1,15 @@
 <%@ page import="ru.ecom.jaas.ejb.form.SecRoleForm" %>
 <%@ page import="ru.ecom.jaas.ejb.service.CheckNode"%>
-<%@ page import="ru.ecom.jaas.web.action.role.RolePoliciesEditAction"%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="ru.ecom.jaas.ejb.service.ISecRoleService"%>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://struts.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://www.nuzmsh.ru/tags/msh" prefix="msh" %>
 <%@ taglib uri="http://www.ecom-ast.ru/tags/ecom" prefix="ecom" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 
-<%@page import="ru.ecom.jaas.ejb.service.ISecRoleService"%>
-<%@page import="ru.ecom.web.util.Injection"%>
 <%@page import="ru.ecom.jaas.web.action.role.CheckNodesUtil"%>
+<%@page import="ru.ecom.jaas.web.action.role.RolePoliciesEditAction"%>
+<%@page import="ru.ecom.web.util.Injection"%>
 <tiles:insert page="/WEB-INF/tiles/mainLayout.jsp" flush="true">
 
     <tiles:put name='title' type='string'>
@@ -62,6 +62,16 @@
         </msh:row>                
                         <msh:submitCancelButtonsRow colSpan="4"/>
             </msh:panel>
+            <ecom:webQuery name="childFor" nativeSql="select par.id, par.name
+                from secrole_secrole ss
+                left join secrole par on par.id=ss.secrole_id
+               where ss.children_id=${param.id}" />
+            <msh:tableNotEmpty name="childFor">
+                <msh:section title="Есть в ролях"/>
+                <msh:table name="childFor" action="entityView-secrole.do" idField="1">
+                    <msh:tableColumn property="2" columnName="Родительская роль"/>
+                </msh:table>
+            </msh:tableNotEmpty>
         </msh:form>
 
         <%
@@ -127,14 +137,13 @@
         %>
             var gLogger;
             var tree;
-            var nodes = new Array();
+            var nodes = [];
             var nodeIndex;
 
 
             function treeInit() {
                 if (typeof(ygLogger) != "undefined") {
                     ygLogger.init(document.getElementById("logDiv"));
-                    //gLogger = new ygLogger("basic.php");
                 }
 
                 buildRandomTextNodeTree();
@@ -146,8 +155,7 @@
 
             function buildRandomTextNodeTree() {
                 tree = new YAHOO.widget.TreeView("treeDiv1");
-
-                var root = tree.getRoot() ;
+                var root = tree.getRoot() ; //не убираем, нужно
     <%
                 RolePoliciesEditAction.printNode(out, (CheckNode) request.getAttribute("policies"));
     %>
