@@ -15,6 +15,7 @@ import ru.ecom.ejb.services.query.WebQueryResult;
 import ru.ecom.ejb.services.util.ConvertSql;
 import ru.ecom.ejb.util.injection.EjbEcomConfig;
 import ru.ecom.ejb.xml.XmlUtil;
+import ru.ecom.expomc.ejb.domain.omcvoc.OmcKodTer;
 import ru.ecom.expomc.ejb.domain.registry.RegInsuranceCompany;
 import ru.ecom.jaas.ejb.domain.SoftConfig;
 import ru.ecom.jaas.ejb.service.SoftConfigServiceBean;
@@ -26,10 +27,7 @@ import ru.ecom.mis.ejb.domain.lpu.LpuArea;
 import ru.ecom.mis.ejb.domain.lpu.LpuAreaAddressPoint;
 import ru.ecom.mis.ejb.domain.lpu.MisLpu;
 import ru.ecom.mis.ejb.domain.medcase.MedCase;
-import ru.ecom.mis.ejb.domain.patient.LpuAttachedByDepartment;
-import ru.ecom.mis.ejb.domain.patient.Patient;
-import ru.ecom.mis.ejb.domain.patient.PatientFond;
-import ru.ecom.mis.ejb.domain.patient.PatientFondCheckData;
+import ru.ecom.mis.ejb.domain.patient.*;
 import ru.ecom.mis.ejb.domain.patient.voc.*;
 import ru.ecom.mis.ejb.form.lpu.interceptors.LpuAreaDynamicSecurity;
 import ru.ecom.mis.ejb.form.patient.MedPolicyOmcForm;
@@ -69,7 +67,7 @@ import java.util.StringTokenizer;
 public class PatientServiceBean implements IPatientService {
 
 	private static final Logger LOG = Logger.getLogger(PatientServiceBean.class);
-	private static final boolean CAN_DEBUG = LOG.isDebugEnabled();
+
 	/**Выгружаем список карт Д наблюдения */
 	public String exportDispensaryCard(java.util.Date aDateFrom, java.util.Date aDateTo, java.util.Date aDateChanged, String aPacketNumber)  {
 		JSONObject ret = new JSONObject();
@@ -177,7 +175,6 @@ public class PatientServiceBean implements IPatientService {
 		String aPolicyNumber = fond.getPolicyNumber();
 		String aCompanyCode = fond.getCompanyCode();
 
-		//	try {
 				if (aLpuAttached!=null&&aAttachedDate!=null&&aAttachedType!=null) {
 					String aSql = "select " +
 							" case when (select max(sc.keyvalue) from softconfig sc where sc.key='DEFAULT_LPU_OMCCODE')!='"+aLpuAttached+"' then 1" +
@@ -202,13 +199,10 @@ public class PatientServiceBean implements IPatientService {
 					if (mp.toString().equals("0")) {isDifference = true;}
 				}
 
-			/*} catch (Exception e) {
-				e.printStackTrace();
-			}*/
 			return isDifference;
 	}
 
-	public boolean needChangeValue (Object aOldValue, Object aNewValue) {
+	private boolean needChangeValue(Object aOldValue, Object aNewValue) {
 		if (toStr(aOldValue)==null && toStr(aNewValue)!=null) {return true;} //Старое значение пустое, новое - нет, обновляем.
 		if (toStr(aNewValue)==null) {return false;} //На пустое значение не обновляем.
 		return !toStr(aOldValue).equals(toStr(aNewValue));
@@ -534,121 +528,85 @@ public class PatientServiceBean implements IPatientService {
 	private String toStr(Object o) {
 		return o==null || o.toString().trim().equals("") ? null : o.toString();
 	}
-	private String prepSql(String aField, String aValue) {
-		return prepSql (aField, aValue,"","");
-	}
-	private String prepSql(String aField, String aValue, String aPrefix, String aPostfix) {
-		if (aValue==null) {aValue="";}
-			return aField+"="+aPrefix+"'"+aValue+"'"+aPostfix;
-
-	}
-	public boolean updateDataByFondAutomaticByFIO (String aLastName, String aFirstName, String aMiddleName, String aBirthday, Long aCheckTimeId,boolean needUpdatePatient, boolean needUpdateDocuments, boolean needUpdatePolicy, boolean needUpdateAttachment) {
-		Object list = theManager.createNativeQuery("select max(pf.id) from patientfond pf where pf.lastname='"+aLastName+"' and " +
-				"pf.firstname = '"+aFirstName+"' and pf.middlename = '"+aMiddleName+"' and pf.birthday=to_date('"+aBirthday +
-				"','dd.MM.yyyy') and pf.checkTime_id='"+aCheckTimeId+"'").getSingleResult();
-		if (list!=null) {
-			Long patF = Long.valueOf(list.toString());
-			return updateDataByFondAutomatic(patF, aCheckTimeId, needUpdatePatient, needUpdateDocuments, needUpdatePolicy, needUpdateAttachment);
-		}
-		return false;
-	}
 
 	public boolean updateDataByFondAutomatic (Long aPatientFondId, Long aCheckId
 			,boolean needUpdatePatient, boolean needUpdateDocuments, boolean needUpdatePolicy, boolean needUpdateAttachment) {
 		try{
-		if (needUpdateAttachment||needUpdateDocuments||needUpdatePatient||needUpdatePolicy) {
-			StringBuilder str = new StringBuilder();
-			//String curDate = DateFormat.formatToDate(new java.util.Date()) ;
-			str.append("update Patient p set ");
-			int o=0;
-			List<Object[]> listZ = theManager.createNativeQuery("select pf.id" +
-					", pf.lastname, pf.firstname, pf.middlename, pf.commonnumber, pf.snils" +
-					" ,pf.documentnumber as f6_docnumber,pf.documentseries, pf.documenttype, pf.documentdateissued, documentwhomissued" +
-					" ,pf.lpuattached, pf.attachedtype, to_char(pf.attacheddate,'dd.MM.yyyy') as attDate " +
-					" ,pf.policyseries, pf.policynumber, to_char(pf.policydatefrom,'dd.MM.yyyy') as polFrom, to_char(pf.policydateto,'dd.MM.yyyy') as polTo, pf.companycode, to_char(pf.birthday,'dd.MM.yyyy')as birthday, pf.patient" +
-					" ,to_char(pf.checkDate,'dd.MM.yyyy') as checkDate " +
-					" ,pf.street as f22_street, pf.okato as f23_okato, pf.doctorsnils as f24_docsnils" +
-					" from patientfond pf where pf.id='"+aPatientFondId+"' ").getResultList();
-			if (!listZ.isEmpty()) {
-			Object[] arr = listZ.get(0);
+		if ( aPatientFondId!=null && (needUpdateAttachment || needUpdateDocuments
+				|| needUpdatePatient || needUpdatePolicy)) {
+			SimpleDateFormat ddMMyyyy = new SimpleDateFormat("dd.MM.yyyy");
 			PatientFond patF = theManager.find(PatientFond.class, aPatientFondId);
-			String aLastname = toStr(arr[1]), aFirstname = toStr(arr[2]), aMiddlename=toStr(arr[3]),aRz = toStr(arr[4])
-					,aSnils = toStr(arr[5]),aDocNumber = toStr(arr[6]),aDocSeries = toStr(arr[7]),aDocType = toStr(arr[8])
-					,aDocDateIssued = toStr(arr[9]), aDocWhomIssued =toStr(arr[10])
-					,aAttachedLpu=toStr(arr[11]),aAttachedType=toStr(arr[12]),aAttachedDate=toStr(arr[13])
-					,aPolicySeries=toStr(arr[14]),aPolicyNumber=toStr(arr[15]),aPolicyDateFrom=toStr(arr[16])
-					,aPolicyDateTo=toStr(arr[17]),aCompany=toStr(arr[18]), aBirthday=toStr(arr[19]), aCheckDate = toStr(arr[21])
-					, doctorSnils = toStr(arr[24]);
+			String rz = patF.getCommonNumber()
 
-			Long aPatientId =toStr(arr[20])!=null?Long.valueOf(toStr(arr[20])):null;
-			String aStreet = toStr(arr[22]), aOkato = toStr(arr[23]);
-
-			String address = getAddressByOkato(aOkato, aStreet);
+					,aPolicyNumber=patF.getPolicyNumber(),aCompany=patF.getCompanyCode() , doctorSnils = patF.getDoctorSnils();
+			Long patientId =patF.getPatient();
+			if (patientId == null) return false;
+			Patient patient = theManager.find(Patient.class,patientId);
 
 			if (needUpdatePatient) {
-				o=1;
-				if (aSnils!=null&&!aSnils.equals("")) {
-					str.append(prepSql("snils",aSnils));
+				String snils = patF.getSnils();
+				if (!StringUtil.isNullOrEmpty(snils)) {
+					patient.setSnils(snils);
 				}
-				str.append(prepSql((str.length()>23?", commonnumber":"commonnumber"),aRz));
-				if (address!=null) { str.append(prepSql(", address_addressid", address));}
-				patF.setIsPatientUpdate(true);
-			} else {patF.setIsPatientUpdate(false);}
+				patient.setCommonNumber(rz);
+				String aStreet = patF.getStreet(), aOkato = patF.getOkato();
+				String address = getAddressByOkato(aOkato, aStreet);
+				if (address != null) {
+					patient.setAddress(theManager.find(Address.class, Long.parseLong(address)));
+					patient.setHouseBuilding(patF.getHouseBuilding());
+					patient.setFlatNumber(patF.getFlat());
+					patient.setHouseNumber(patF.getHouse());
+				}
+			}
+			patF.setIsPatientUpdate(needUpdatePatient);
 
 			if (needUpdateDocuments) {
-				if (aDocNumber!=null&&aDocSeries!=null&&aDocType!=null&&aDocDateIssued!=null) {
-					if (o==1) {
-						str.append(",");
-					}
-					str.append(prepSql("passportnumber",aDocNumber)).append(prepSql(",passportseries",aDocSeries,"",","))
-					.append(prepSql("passporttype_id",aDocType,"(select v.id from vocidentitycard v where v.omccode=",")"))
-					.append(prepSql(",passportdateissued",aDocDateIssued,"to_date(",",'dd.MM.yyyy')"))
-					.append(prepSql(",passportwhomissued",aDocWhomIssued));
-					o=1;
+				String docType = patF.getDocumentType(),docNumber = patF.getDocumentNumber();
+				if (!StringUtil.isNullOrEmpty(docType) && !StringUtil.isNullOrEmpty(docNumber)) {
+					patient.setPassportNumber(docNumber);
+					patient.setPassportSeries(patF.getDocumentSeries());
+					patient.setPassportWhomIssued(patF.getDocumentWhomIssued());
+					patient.setPassportDateIssued(DateFormat.parseSqlDate(patF.getDocumentDateIssued()));
+					List<VocIdentityCard> cards = theManager.createNamedQuery("VocIdentityCard.findByOmcCode")
+							.setParameter("code", docType).getResultList();
+					patient.setPassportType(cards.isEmpty() ? null : cards.get(0));
 					patF.setIsDocumentUpdate(true);
-				} else {patF.setIsDocumentUpdate(false);}
-
-			} else {patF.setIsDocumentUpdate(false);}
-			if (o==1) {
-				str.append(" where id=").append(aPatientId);
-
+				} else {
+					patF.setIsDocumentUpdate(false);
+				}
+			} else {
+				patF.setIsDocumentUpdate(false);
 			}
+
 			if (needUpdatePolicy) {
-				patF.setIsPolicyUpdate(updateOrCreatePolicyByFond(aPatientId, aRz, aLastname, aFirstname, aMiddlename, aBirthday, aCompany
-						, aPolicySeries, aPolicyNumber, aPolicyDateFrom, aPolicyDateTo, aCheckDate));
+				patF.setIsPolicyUpdate(updateOrCreatePolicyByFond(patientId, rz, patF.getLastname(), patF.getFirstname(), patF.getMiddlename()
+						, DateFormat.formatToDate(patF.getBirthday()), aCompany, patF.getPolicySeries()
+						, patF.getPolicyNumber(), DateFormat.formatToDate(patF.getPolicyDateFrom()), DateFormat.formatToDate(patF.getPolicyDateTo())
+						, DateFormat.formatToDate(patF.getCheckDate())));
 
 
 			} else {patF.setIsPolicyUpdate(false);}
 			if (needUpdateAttachment) {
-				String s = updateOrCreateAttachment(aPatientId, aCompany, aAttachedLpu, aAttachedType, aAttachedDate, doctorSnils,true, false);
+				String s = updateOrCreateAttachment(patientId, aCompany, patF.getLpuAttached(), patF.getAttachedType()
+						, DateFormat.formatToDate(patF.getAttachedDate())
+						, doctorSnils,true, false);
 				patF.setIsAttachmentUpdate((s!=null && s.length()>0));
 
 			} else {patF.setIsAttachmentUpdate(false);}
 			theManager.persist(patF);
 
-			if (patF.getIsPatientUpdate()&&patF.getIsDocumentUpdate()&&patF.getIsPolicyUpdate()&&patF.getIsAttachmentUpdate()) {
+			if (patF.getIsPatientUpdate() && patF.getIsDocumentUpdate() && patF.getIsPolicyUpdate() && patF.getIsAttachmentUpdate()) {
 				patF.setIsDifference(false);
 			} else {
-				patF.setIsDifference(needUpdatePatient(aPatientId, aPatientFondId));
+				patF.setIsDifference(needUpdatePatient(patientId, aPatientFondId));
 			}
-
-
 			theManager.persist(patF);
 			return true;
-
-			} else {
-				return false;
-			}
-
 		}
 	} catch (Exception e) {
 		e.printStackTrace();
-
 	}
 		return false;
-
-
-
 	}
 	public String updateOrCreateAttachment(Long aPatientId, String aCompany, String aLpu, String aAttachedType, String aAttachedDate, String aDoctorSnils
 			, boolean ignoreType, boolean updateEditDate) {
@@ -1008,43 +966,16 @@ public class PatientServiceBean implements IPatientService {
 		}
 		return true ;
 	}
-	/*public void insertCheckFondData(
-			String aLastname,String aFirstname,String aMiddlename,String aBirthday
-			,String aSnils
-			,String aCommonNumber,String aPolicySeries,String aPolicyNumber
-			,String aPolicyDateFrom, String aPolicyDateTo
-			,String aUsername, String aCheckType
-			,String aCompanyCode ,String aCompabyCodeF,String aCompanyOgrn, String aCompanyOkato
-			,String aDocumentType, String aDocumentSeries,String aDocumentNumber
-			,String aKladr,String aHouse, String aHouseBuilding, String aFlat
-			,String aLpuAttached, String aAttachedDate, String aAttachedType
-			) throws ParseException {
-		insertCheckFondData(aLastname,aFirstname,aMiddlename,aBirthday,aSnils,aCommonNumber,aPolicySeries,aPolicyNumber
-				,aPolicyDateFrom,aPolicyDateTo,aUsername,aCheckType,aCompanyCode,aCompabyCodeF,aCompanyOgrn, aCompanyOkato
-				,aDocumentType,aDocumentSeries,aDocumentNumber, aKladr,aHouse,aHouseBuilding,aFlat
-				,aLpuAttached,aAttachedDate,aAttachedType,null);
-	}
-	public void insertCheckFondData(
-			String aLastname,String aFirstname,String aMiddlename,String aBirthday
-			,String aSnils
-			,String aCommonNumber,String aPolicySeries,String aPolicyNumber
-			,String aPolicyDateFrom, String aPolicyDateTo
-			,String aUsername, String aCheckType
-			,String aCompanyCode ,String aCompabyCodeF,String aCompanyOgrn, String aCompanyOkato
-			,String aDocumentType, String aDocumentSeries,String aDocumentNumber
-			,String aKladr,String aHouse, String aHouseBuilding, String aFlat
-			,String aLpuAttached, String aAttachedDate, String aAttachedType, String dateDeath
-			) throws ParseException {
-		insertCheckFondData(aLastname,aFirstname,aMiddlename,aBirthday,aSnils,aCommonNumber,aPolicySeries,aPolicyNumber
-				,aPolicyDateFrom,aPolicyDateTo,aUsername,aCheckType,aCompanyCode,aCompabyCodeF,aCompanyOgrn, aCompanyOkato
-				,aDocumentType,aDocumentSeries,aDocumentNumber, aKladr,aHouse,aHouseBuilding,aFlat
-				,aLpuAttached,aAttachedDate,aAttachedType,null,null,null,null,null,null,null,null,null);
-	}*/
-
-	public void insertCheckFondData(String aLastname, String aFirstname, String aMiddlename, String aBirthday, String aSnils, String aCommonNumber, String aPolicySeries, String aPolicyNumber, String aPolicyDateFrom, String aPolicyDateTo, String aUsername, String aCheckType, String aCompanyCode, String aCompabyCodeF, String aCompanyOgrn, String aCompanyOkato, String aPatientId)
-			throws ParseException
-	{
-		insertCheckFondData(aLastname, aFirstname, aMiddlename, aBirthday, aSnils, aCommonNumber, aPolicySeries, aPolicyNumber, aPolicyDateFrom, aPolicyDateTo, aUsername, aCheckType, aCompanyCode, aCompabyCodeF, aCompanyOgrn, aCompanyOkato, aPatientId, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+	public void insertCheckFondData(String aLastname, String aFirstname, String aMiddlename, String aBirthday, String aSnils
+			, String aCommonNumber, String aPolicySeries, String aPolicyNumber, String aPolicyDateFrom, String aPolicyDateTo
+			, String aUsername, String aCheckType, String aCompanyCode, String aCompabyCodeF, String aCompanyOgrn
+			, String aCompanyOkato, String aPatientId) throws ParseException {
+		insertCheckFondData(aLastname, aFirstname, aMiddlename, aBirthday, aSnils, aCommonNumber, aPolicySeries, aPolicyNumber
+				, aPolicyDateFrom, aPolicyDateTo, aUsername, aCheckType, aCompanyCode, aCompabyCodeF, aCompanyOgrn, aCompanyOkato
+				, aPatientId, null, null, null, null, null
+				, null, null, null, null, null, null
+				, null, null, null, null, null
+				, null, null);
 	}
 	public Long insertCheckFondData(
 			String aLastname,String aFirstname,String aMiddlename,String aBirthday
@@ -1222,6 +1153,7 @@ public class PatientServiceBean implements IPatientService {
 			theManager.createNativeQuery("  update JournalChangePatient set patient_id =:idnew where patient_id =:idold ").setParameter("idnew", aIdNew).setParameter("idold", aIdOld).executeUpdate();
 			theManager.createNativeQuery("  update SuicideMessage set patient_id =:idnew where patient_id =:idold ").setParameter("idnew", aIdNew).setParameter("idold", aIdOld).executeUpdate();
 			theManager.createNativeQuery("  update QualityEstimationCard set patient_id =:idnew where patient_id =:idold ").setParameter("idnew", aIdNew).setParameter("idold", aIdOld).executeUpdate();
+			theManager.createNativeQuery("  update Covid19 set patient_id =:idnew where patient_id =:idold ").setParameter("idnew", aIdNew).setParameter("idold", aIdOld).executeUpdate();
 	}
 
 	public List<VocOrgForm> findOrg(String aNewNumber, String aOldNumber, String aName) {
@@ -1360,9 +1292,7 @@ public class PatientServiceBean implements IPatientService {
 					builder.addParameter("nextid", fiIdprev);
 				}
 
-				Query query = builder.buildNative(theManager, new StringBuilder().append(sqlFld)
-						.append(" from patient p ").append(sql)
-						.append(" and ").append(p1).toString()," group by p.id,p.lastname,p.firstname,p.middlename,p.birthday,p.patientSync,p.ColorType order by p.lastname "+(aNext?"":" desc")+",p.firstname "+(aNext?"":" desc")+",p.middlename "+(aNext?"":" desc")+",p.id "+(aNext?"":" desc"));
+				Query query = builder.buildNative(theManager, sqlFld+" from patient p "+sql+" and "+p1," group by p.id,p.lastname,p.firstname,p.middlename,p.birthday,p.patientSync,p.ColorType order by p.lastname "+(aNext?"":" desc")+",p.firstname "+(aNext?"":" desc")+",p.middlename "+(aNext?"":" desc")+",p.id "+(aNext?"":" desc"));
 				appendNativeToList(query, ret1,null,aNext);
 				sqlFld = new StringBuilder() ;
 				sqlFld.append("select p.id,p.lastname||' '||list(case when p.lastname!=jcp.lastname then '('||jcp.lastname||')' else '' end) as lastname");
@@ -1385,17 +1315,15 @@ public class PatientServiceBean implements IPatientService {
 				if (ret1.isEmpty() && aIdNext!=null && !aIdNext.equals("")) return findPatient( aLpuId, aLpuAreaId, aLastname, aYear, !aNext, null) ;
 			}
 		} else {
-			if (CAN_DEBUG) {
-				LOG.debug("findPatient() aLpuId = " + aLpuId + ", aLpuAreaId = "
-						+ aLpuAreaId + ", aLastname = " + aLastname);
-			}
 			StringBuilder sql = new StringBuilder() ;
 			StringBuilder sqlFld1 = new StringBuilder() ;
 			sqlFld1.append("select p.id,p.lastname||' '||list(case when p.lastname!=jcp.lastname then '('||jcp.lastname||')' else '' end) as lastname");
 			sqlFld1.append(",p.firstname||' '||list(case when p.firstname!=jcp.firstname then '('||jcp.firstname||')' else '' end) firstname");
 			sqlFld1.append(",p.middlename||' '||list(case when p.middlename!=jcp.middlename then '('||jcp.middlename||')' else '' end) as middlename");
 			sqlFld1.append(" ,p.birthday") ;
-			sqlFld1.append(" ,p.patientSync,case when p.colorType='1' then cast('red' as varchar(200)) else coalesce((select coalesce((select max(pl.colorText) from PatientList pl left join VocPatientListType vplt on vplt.id=pl.type where vplt.code='SUICIDE'),'#01D') from SuicideMessage sui where sui.patient_id=p.id),(select coalesce('background:'||max(pl.colorName)||';','')||coalesce('color:'||max(pl.colorText)||';font-size: 14px;','') from PatientListRecord plr left join PatientList pl on pl.id=plr.PatientList where plr.patient=p.id and pl.isViewWhenSeaching='1' group by plr.patient)) end as ColorType ") ;
+			sqlFld1.append(" ,p.patientSync,case when p.colorType='1' then cast('color: red' as varchar(200)) else coalesce((select coalesce((select 'color: '||max(pl.colorText) " +
+					" from PatientList pl left join VocPatientListType vplt on vplt.id=pl.type where vplt.code='SUICIDE'),'#01D') from SuicideMessage sui where sui.patient_id=p.id)" +
+					",(select coalesce('background:'||max(pl.colorName)||';','')||coalesce('color:'||max(pl.colorText)||';font-size: 14px;','') from PatientListRecord plr left join PatientList pl on pl.id=plr.PatientList where plr.patient=p.id and pl.isViewWhenSeaching='1' group by plr.patient)) end as ColorType ") ;
 			sqlFld1.append(" ,list(case when att.dateto is null then to_char(att.datefrom,'dd.mm.yyyy')||' ('||vat.code||') '||ml.name else null end) as lpuname") ;
 			sqlFld1.append(" ,list(case when att.dateto is null then ma.number else null end) as areaname") ;
 			sqlFld1.append(" ,(select case when pf1.id is null then '-' else 'от '||to_char(pf1.checkdate,'dd.mm.yyyy') ||") ;
@@ -1449,14 +1377,11 @@ public class PatientServiceBean implements IPatientService {
 					}
 					builder.addParameter("nextid", fiIdprev);
 				}
-				//sql.append(" ((").append(p1).append(") or (").append(p2).append("))") ;
 			}
 
 			builder.add("att.lpu_id", aLpuId);
 			builder.add("att.area_id", aLpuAreaId);
-			Query query = builder.buildNative(theManager, new StringBuilder().append(sqlFld)
-					.append(" from patient p ").append(sql)
-					.append(p1).toString(),
+			Query query = builder.buildNative(theManager,sqlFld+" from patient p "+sql+p1,
 					"group by p.id,p.lastname,p.firstname,p.middlename,p.birthday ,p.patientSync, p.colorType order by  p.lastname "+(aNext?"":" desc")+",p.firstname "+(aNext?"":" desc")+",p.middlename "+(aNext?"":" desc")+",p.id "+(aNext?"":" desc"));
 			appendNativeToList(query, ret1,null,aNext);
 			if (ret1.isEmpty() && aIdNext!=null && !aIdNext.equals("")) return findPatient( aLpuId, aLpuAreaId, aLastname, aYear, !aNext, null) ;
@@ -1605,9 +1530,9 @@ public class PatientServiceBean implements IPatientService {
 			PatientForm f = new PatientForm();
 			f.setId(((Number) arr[0]).longValue());
 			if (arr.length>6 && arr[6]!=null) {
-				f.setLastname("<font color='" + arr[6] + "'>" + arr[1] + "</font>");
-				f.setFirstname("<font color='" + arr[6] + "'>" + arr[2] + "</font>");
-				f.setMiddlename("<font color='" + arr[6] + "'>" + arr[3] + "</font>");
+				f.setLastname("<font style='" + arr[6] + "'>" + arr[1] + "</font>");
+				f.setFirstname("<font style='" + arr[6] + "'>" + arr[2] + "</font>");
+				f.setMiddlename("<font style='" + arr[6] + "'>" + arr[3] + "</font>");
 				if(arr[4]!=null) {
 					f.setBirthday(DateFormat.formatToDate((java.util.Date) arr[4])) ;
 				}
@@ -1696,10 +1621,6 @@ public class PatientServiceBean implements IPatientService {
 	 */
 	public LpuAreaAddressPoint findPoint(Address aAddress, String aNumber,
 			String aBuilding, Date aBirthday, String aFlat) {
-		if (CAN_DEBUG) {
-			LOG.debug("findPoint() aAddress = " + aAddress.getId()
-					+ ", aNumber=" + aNumber + ", aBuilding = " + aBuilding);
-		}
 		// ребенок, если < 18 и есть дата рождения
 		boolean isChild = aBirthday != null && AgeUtil.calcAgeYear(aBirthday, new java.util.Date()) < 18;
 		EntityManager manager = theManager; // theFactory.createEntityManager();
@@ -1719,8 +1640,6 @@ public class PatientServiceBean implements IPatientService {
 		sb.append(" and flat ").append(
 				StringUtil.isNullOrEmpty(aFlat) ? " is null "
 						: " = :flat ");
-
-		if (CAN_DEBUG) LOG.debug("query = "+sb);
 
 		Query query = manager.createQuery(sb.toString());
 		if (!StringUtil.isNullOrEmpty(aNumber))
@@ -1883,5 +1802,87 @@ private @EJB
 	public String getConfigValue(String aConfigName, String aDefaultValue) {
 		EjbEcomConfig config = EjbEcomConfig.getInstance() ;
 		return config.get(aConfigName, aDefaultValue);
+	}
+
+	/**Находим либо создаем пациента*/
+	public Patient getPatient(String aLastname, String aFirstname, String aMiddlename, Date aBirthDay, String aSexCode, String aCommonNumber
+			,String addDataString)  {
+		JSONObject addData = new JSONObject(addDataString);
+		List<Patient> patients = theManager.createQuery("from Patient where lastname=:lastname and firstname=:firstname" +
+				" and middlename=:middlename  and birthday=:birthday" +
+				" and (commonNumber is null or commonNumber=:commonNumber)")
+				.setParameter("lastname",aLastname).setParameter("firstname",aFirstname).setParameter("middlename",aMiddlename)
+				.setParameter("birthday",aBirthDay).setParameter("commonNumber",aCommonNumber)
+				.getResultList();
+		if (patients.isEmpty()) { //Создаем нового пациента
+			Patient patient = new Patient();
+			patient.setLastname(aLastname.toUpperCase());
+			patient.setFirstname(aFirstname.toUpperCase());
+			patient.setMiddlename(aMiddlename.toUpperCase());
+			patient.setBirthday(aBirthDay);
+			patient.setCommonNumber(aCommonNumber);
+			patient.setSnils(getStr(addData,"snils"));
+			patient.setBirthPlace(getStr(addData, "birthPlace"));
+			patient.setSex(getByCode(VocSex.class, aSexCode));
+			theManager.persist(patient);
+			if (addData.has("ogrn")) {
+				String okato = addData.getString("okato");
+				String ogrn = getStr(addData,"ogrn");
+				try {
+					List<RegInsuranceCompany> regInsuranceCompanies = theManager.createQuery("from RegInsuranceCompany where ogrn=:ogrn" +
+							" and (deprecated is null or deprecated is false)").setParameter("ogrn",ogrn).getResultList();
+					if ("12000".equals(okato)) { //местный полис
+						MedPolicyOmc policy = new MedPolicyOmc();
+						policy.setActualDateFrom(DateFormat.parseSqlDate(addData.getString("policyStartDate"), "ddMMyyyy"));
+						policy.setLastname(aLastname);
+						policy.setFirstname(aFirstname);
+						policy.setMiddlename(aMiddlename);
+						policy.setBirthday(aBirthDay);
+						policy.setPatient(patient);
+						policy.setCommonNumber(aCommonNumber);
+						policy.setPolNumber(aCommonNumber);
+						if (!regInsuranceCompanies.isEmpty()) policy.setCompany(regInsuranceCompanies.get(0));
+						policy.setType(getByCode(VocMedPolicyOmc.class,"3")); //врядли будет другое
+						theManager.persist(policy);
+					} else if (okato!=null){ //ОМС иногорднего
+						MedPolicyOmcForeign policy = new MedPolicyOmcForeign();
+						policy.setActualDateFrom(DateFormat.parseSqlDate(addData.getString("policyStartDate"), "ddMMyyyy"));
+						if (!regInsuranceCompanies.isEmpty()) policy.setCompany(regInsuranceCompanies.get(0));
+						policy.setLastname(aLastname);
+						policy.setFirstname(aFirstname);
+						policy.setMiddlename(aMiddlename);
+						policy.setBirthday(aBirthDay);
+						policy.setPatient(patient);
+						policy.setCommonNumber(aCommonNumber);
+						policy.setPolNumber(aCommonNumber);
+						policy.setType(getByCode(VocMedPolicyOmc.class,"3")); //врядли будет другое
+						policy.setInsuranceCompanyOgrn(ogrn);
+						policy.setInsuranceCompanyRegion(getByCode(OmcKodTer.class,okato,"okato"));
+						theManager.persist(policy);
+					}
+				} catch (ParseException e) {
+					LOG.error("some error",e);
+				}
+
+			}
+			return patient;
+		} else if (patients.size()==1) {
+			return patients.get(0);
+		} else { //Найдено более 1 пациента, возвращаем ссылку на страницу с поиском пациента
+			return null;
+		}
+	}
+
+	private String getStr(JSONObject obj, String aFldName) {
+		return obj.has(aFldName) ? obj.getString(aFldName) : null;
+	}
+
+	private <T> T getByCode(Class aClass, String aCode) {
+		return getByCode(aClass,aCode,null);
+	}
+	private <T> T getByCode(Class aClass, String aCode, String aFldName) {
+		List<T> list = theManager.createQuery("from "+aClass.getName()+" where "+(aFldName!=null?aFldName:"code")+"=:code")
+				.setParameter("code",aCode).getResultList();
+		return list.isEmpty() ? null : list.get(0);
 	}
 }

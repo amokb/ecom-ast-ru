@@ -20,8 +20,7 @@
    <title>МедОС</title>
    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
    <meta content="text/javascript; charset=utf-8" />
-	<link title='Поиск в МИАЦ' rel='search' type='application/opensearchdescription+xml' href='opensearch.jsp?tmp=6'/>
-	
+
 <msh:ifInIdeMode>
    <script type='text/javascript' src='ru.ecom.gwt.idemode.Main/ru.ecom.gwt.idemode.Main.nocache.js'></script>
    <script type='text/javascript' src='./dwr/interface/IdeModeService-CA113b8ec45f6.js'></script>   
@@ -45,19 +44,6 @@
 
      <script type="text/javascript">
          var ws_socketServerStorageName;
- /*        jQuery(document).ready(function() {
-             var xhr = new XMLHttpRequest();
-             xhr.open('GET', 'GetMessageFromFile?username=${username}', false);
-             xhr.send();
-             if (xhr.status != 200) {
-                 alert( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
-             } else {
-                 //alert(xhr.responseText); // responseText -- текст ответа.
-                 var t = document.getElementById('message');
-                 t.innerHTML=xhr.responseText
-             }
-         });
-*/
 
      </script>
      <msh:ifInRole roles="/Policy/WebSocket">
@@ -179,8 +165,6 @@
             <msh:sideLink params="" styleId="mainMenuTemplate" action="/entityList-diary_template.do" name="Шаблоны"
                           title="Шаблоны" roles="/Policy/MainMenu/Template"/>
 
-
-                          
             <msh:sideLink params="" styleId="mainMenuContract" action="/contract_find_by_number.do" name="Договоры"
                           title="Договоры" roles="/Policy/MainMenu/Contract,/Policy/Mis/Contract/MedContract/View"/>
 
@@ -196,8 +180,8 @@
                           roles="/Policy/Mis/Pharmacy/Administration" title="Аптека"/>
             <msh:sideLink params="" styleId="mainMenuConfig" action="/riams_config.do" name="Настройки"
                           roles="/Policy/MainMenu/Config" title="Настройки"/>
-            <msh:sideLink params="" styleId="mainMenuConfig" action="/http://keo.amokb.ru/keo?" name="Порядки, стандарты,<br>клин. рекомендации"
-                          roles="/Policy/MainMenu/Standards" title="Настройки"/>
+            <msh:sideLink params="" styleId="mainMenuConfig" action="/http://keo.amokb.ru/keo?" name="НСИ"
+                          roles="/Policy/MainMenu/Standards" title="Нормативно-справочная информация"/>
 
         </ul>
 
@@ -292,7 +276,6 @@
 				<!--  IDE MODE -->
 				<msh:ifInIdeMode>
 						<li><a id='ideModeHideIdeTags' href='javascript:msh.idemode.hideIdeTags();'>Скрыть тэги</a></li>
-						<li><a href='javascript:msh.idemode.addGuids();'>Добавить GUIDs</a></li>
 						<li><a href='javascript:msh.idemode.addNewForm();'>Добавить форму</a></li>
 				</msh:ifInIdeMode>
            </ul>

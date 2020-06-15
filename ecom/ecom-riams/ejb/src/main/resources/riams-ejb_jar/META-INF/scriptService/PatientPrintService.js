@@ -191,3 +191,20 @@ function printAgreement(aCtx, aParams) {
 	//return map ;
 	return printInfo(aCtx, aParams);
 }
+
+function printCovid(aCtx, aParams) {
+	var covidCard = aCtx.manager.find(Packages.ru.ecom.mis.ejb.domain.medcase.Covid19, new java.lang.Long(aParams.get(("id"))));
+	map.put("card", covidCard);
+	map.put("pat", covidCard.patient);
+	var hosp = covidCard.medCase;
+	map.put("hosp", hosp);
+	map.put("isLabConfirmed",covidCard.labResult=="1" ? "да":"нет");
+	var age = Packages.ru.nuzmsh.util.date.AgeUtil.calcAgeYear(covidCard.patient.birthday,hosp.dateStart) ;
+	map.put("age",age+"");
+	map.put("contactList",aCtx.manager.createNamedQuery("Covid19Contact.getAllByPatient")
+		.setParameter("patient",covidCard.getPatient()).getResultList());
+
+	return map;
+
+
+}

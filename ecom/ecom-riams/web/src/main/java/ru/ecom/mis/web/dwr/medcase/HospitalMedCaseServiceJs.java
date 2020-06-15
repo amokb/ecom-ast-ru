@@ -18,6 +18,7 @@ import ru.nuzmsh.web.tags.helper.RolesHelper;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -31,7 +32,6 @@ import java.util.List;
  */
 public class HospitalMedCaseServiceJs {
 	private static final Logger LOG = Logger.getLogger(HospitalMedCaseServiceJs.class);
-
 
 	/**Календарь с предварительной госпитализацией*/
 
@@ -258,9 +258,9 @@ public class HospitalMedCaseServiceJs {
 
 	}
 
-	public String getMedcaseCost(String aDateFrom, String aDateTo, String aType, String aLpuCode, HttpServletRequest aRequest ) throws NamingException {
+	public String getMedcaseCost(String aDateFrom, String aDateTo, String aType, String aLpuCode, String aReportType, HttpServletRequest aRequest ) throws NamingException {
 		IHospitalMedCaseService service = Injection.find(aRequest).getService(IHospitalMedCaseService.class);
-		return service.makeReportCostCase(aDateFrom,aDateTo,aType,aLpuCode);
+		return service.makeReportCostCase(aDateFrom,aDateTo,aType,aLpuCode, aReportType);
 	}
 	public String getAllServicesByMedCase(Long aMedcaseId, HttpServletRequest aRequest) throws NamingException {
 		IHospitalMedCaseService service = Injection.find(aRequest).getService(IHospitalMedCaseService.class);
@@ -1773,28 +1773,23 @@ public class HospitalMedCaseServiceJs {
      */
     public String selectIdentityPatient(Long aSlsOrPatId, Boolean aSlsOrPat, HttpServletRequest aRequest) throws NamingException {
         IWebQueryService service = Injection.find(aRequest).getService(IWebQueryService.class) ;
-        StringBuilder sql = new StringBuilder();
-        sql.append("select cip.id,vc.name||' ('||vcip.name||')',vc.code as colorCode,vcip.name as vsipnameJust,vc.picture as pic, cip.info as inf ")
-				.append("from vocColorIdentityPatient vcip ")
-				.append("left join coloridentitypatient cip on cip.voccoloridentity_id=vcip.id ")
-				.append("left join voccolor vc on vcip.color_id=vc.id ")
-				.append(aSlsOrPat? "left join medcase_coloridentitypatient " : "left join patient_coloridentitypatient ")
-				.append(" ss on ss.colorsidentity_id=cip.id where ")
-				.append(aSlsOrPat? "medcase_id='" : "patient_id='")
-				.append(aSlsOrPatId).append("' and cip.startdate<=current_date and (cip.finishdate is null or cip.finishdate>=current_date)");
-        JSONArray res = new JSONArray() ;
-		Collection<WebQueryResult> list = service.executeNativeSql(sql.toString());
-		for (WebQueryResult w :list) {
-			JSONObject o = new JSONObject() ;
-			o.put("vcipId", w.get1())
-					.put("vsipName", w.get2())
-					.put("colorCode", w.get3())
-					.put("vsipnameJust", w.get4())
-					.put("picture", w.get5()!=null? w.get5() : "")
-					.put("info", w.get6()!=null? w.get6() : "");
-			res.put(o);
-		}
-        return res.toString();
+		String sql = "select cip.id,vc.name||' ('||vcip.name||')',vc.code as colorCode,vcip.name as vsipnameJust" +
+				",vc.picture as pic, cip.info as inf,case when vcip.isforpatology then '1' else '0' end as isforpat " +
+				"from vocColorIdentityPatient vcip " +
+				"left join coloridentitypatient cip on cip.voccoloridentity_id=vcip.id " +
+				"left join voccolor vc on vcip.color_id=vc.id " +
+				(aSlsOrPat ? "left join medcase_coloridentitypatient " : "left join patient_coloridentitypatient ") +
+				" ss on ss.colorsidentity_id=cip.id " +
+				" where " +
+				(aSlsOrPat ? "(ss.medcase_id='" : "ss.patient_id='") +
+				aSlsOrPatId + "'" +
+				(aSlsOrPat ? "or ss.medcase_id=(select parent_id from medcase where id='" : "") +
+				(aSlsOrPat ? aSlsOrPatId : "") + (aSlsOrPat ? "'))" : "") +
+				" and (cip.startdate<=current_date and cip.finishdate is null " +
+				" or (cast ((cip.finishdate||' '||cip.finishtime) as TIMESTAMP) > current_timestamp))" +
+				" order by cip.startDate";
+		return service.executeNativeSqlGetJSON(new String[] {"vcipId","vsipName","colorCode","vsipnameJust"
+				,"picture","info","isforpat"}, sql,null);
     }
 
 	/**
@@ -1809,7 +1804,9 @@ public class HospitalMedCaseServiceJs {
 		String login = LoginInfo.find(aRequest.getSession(true)).getUsername() ;
 		StringBuilder sql = new StringBuilder() ;
 		String id="";
-		Collection<WebQueryResult> res = service.executeNativeSql("insert into coloridentitypatient(startdate,finishdate,voccoloridentity_id,createusername) values(current_date,null,"+idP+",'"+login+"') returning id") ;
+		Collection<WebQueryResult> res = service.executeNativeSql
+				("insert into coloridentitypatient(startdate,starttime,finishdate,finishtime,voccoloridentity_id,createusername) values(current_date,current_time,null,null,"
+						+idP+",'"+login+"') returning id") ;
 		for (WebQueryResult wqr : res) {
 			id = wqr.get1().toString();
 		}
@@ -1831,19 +1828,8 @@ public class HospitalMedCaseServiceJs {
 		IWebQueryService service = Injection.find(aRequest).getService(IWebQueryService.class) ;
 		String login = LoginInfo.find(aRequest.getSession(true)).getUsername() ;
 		//закрывается вчерашним днём, чтобы сразу снимался браслет
-		service.executeUpdateNativeSql("update coloridentitypatient set finishdate=current_date-1,editusername='"+login+"' where id="+aColorIdentityId);
+		service.executeUpdateNativeSql("update coloridentitypatient set finishdate=current_date, finishtime=current_time,editusername='"+login+"' where id="+aColorIdentityId);
 	}
-
-    /**
-     * Получить parent СЛС в СЛО #151
-     * @param aSloId HDeparetmentMedCase.id
-     * @return String parent СЛС
-     */
-    public String getParentId(String aSloId, HttpServletRequest aRequest) throws NamingException {
-        IWebQueryService service = Injection.find(aRequest).getService(IWebQueryService.class) ;
-        Collection<WebQueryResult> l= service.executeNativeSql("select parent_id from medcase where id="+aSloId) ;
-        return (!l.isEmpty() && l.iterator().next().get1()!=null)? l.iterator().next().get1().toString():"";
-    }
 
 	/**
 	 * Получить, была ли проведена идентификация #173
@@ -1961,5 +1947,39 @@ public class HospitalMedCaseServiceJs {
 			res.put(o);
 		}
 		return res.toString();
+	}
+
+	/**
+	 * Получить все осложнения в json.
+	 *
+	 * @param surgOperId SurgicalOperation.id
+	 * @return String Выборка в json
+	 * @throws NamingException,SQLException
+	 */
+	public String getCompJson(String surgOperId,HttpServletRequest aRequest) throws NamingException, SQLException {
+		IWebQueryService service = Injection.find(aRequest).getService(IWebQueryService.class);
+		return service.executeSqlGetJson("select to_char(c.datecomp,'dd.mm.yyyy') as date,c.compreasonstring as rtext" +
+				" ,c.complicationstring as ctext,c.complication_id as cid" +
+				" , vc.name as cname from surgcomplication c" +
+				" left join voccomplication vc on vc.id=c.complication_id" +
+				" where surgicaloperation_id="+surgOperId);
+	}
+
+	/**
+	 * Получить, есть ли браслет у услуги для операции.
+	 *
+	 * @param aMedServiceId MedService.id
+	 * @return Boolean true - если есть
+	 * @throws NamingException
+	 */
+	public boolean isMedServiceGotBracelet(Long aMedServiceId, HttpServletRequest aRequest) throws NamingException {
+		IWebQueryService service = Injection.find(aRequest).getService(IWebQueryService.class) ;
+		String ret ;
+		try {
+			ret=service.executeNativeSql("select case when VocColorIdentity_id is not null then '1' else '0' end from medservice where id="+aMedServiceId).iterator().next().get1().toString();
+		} catch (Exception e) {
+			ret = null;
+		}
+		return "1".equals(ret);
 	}
 }

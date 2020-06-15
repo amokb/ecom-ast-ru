@@ -12,7 +12,7 @@
     </tiles:put>
 
     <tiles:put name='side' type='string'>
-
+        <tags:expertvoc_menu currentAction="e2_report_paid_st"/>
     </tiles:put>
 
     <tiles:put name="body" type="string">
@@ -32,6 +32,9 @@
                 <msh:row>
                     <msh:textField property="dateBegin" label="Период с" />
                     <msh:textField property="dateEnd" label="по" />
+                </msh:row>
+                <msh:row>
+                    <msh:textField property="filterAdd1" label="Номера счетов" horizontalFill="true" fieldColSpan="4" />
                 </msh:row>
 
                 <msh:row>
@@ -67,7 +70,6 @@
                     <td onclick="this.childNodes[1].checked='checked';">
                         <input type="radio" name="typeView" value="1">  профилю помощи
                     </td>
-
                     <td onclick="this.childNodes[1].checked='checked';">
                         <input type="radio" name="typeView" value="2"> профиль+отделение
                     </td>
@@ -79,6 +81,9 @@
                     </td>
                     <td onclick="this.childNodes[1].checked='checked';">
                         <input type="radio" name="typeView" value="5">  профиль+отделение+врач+услуга
+                    </td>
+                    <td onclick="this.childNodes[1].checked='checked';">
+                        <input type="radio" name="typeView" value="6">  КСГ
                     </td>
                 </msh:row>
                 <msh:row>
@@ -105,6 +110,19 @@
         <%
             String dateBegin = request.getParameter("dateBegin");
             String dateEnd = request.getParameter("dateEnd");
+            String billNumbers = request.getParameter("filterAdd1");
+            StringBuilder addSql = new StringBuilder();
+            if (billNumbers!=null && !billNumbers.equals("")) {
+                String[] bilNums = billNumbers.split(",");
+
+                addSql.append(" and bill.billnumber in (");
+                for (int i=0;i<bilNums.length;i++) {
+                    if (i>0) addSql.append(",");
+                    addSql.append("'").append(bilNums[i]).append("'");
+                }
+                addSql.append(")");
+                request.setAttribute("addSql",addSql.toString());
+            }
             if (dateBegin!=null && dateEnd!=null) {
                 boolean isReestr = "1".equals(request.getParameter("typeReestr"));
                 request.setAttribute("isReportBase", ActionUtil.isReportBase(dateBegin,dateEnd,request));
@@ -142,6 +160,11 @@
                         sumCostSql=" ,count(distinct ems.id) as f6_cnt, sum(e.cost) as f7_cost";
                         orderBySql = "e.bedsubtype, vmhp.name, e.doctorname, e.doctorsnils";
                         break;
+                    case "6":
+                        selectSql = ", ksg.code, ksg.name, cast('' as varchar)"; //4 field
+                        groupBySql = orderBySql ="ksg.code, ksg.name";
+                        sumCostSql =", cast(sum(e.beddays)/count(e.id) as int),count(e.id), sum(e.cost)";
+                        break;
                     default:
                         selectSql = ",case when e.bedsubtype ='1' then 'КРУГЛОСУТОЧНЫЙ СТАЦ' when e.bedsubtype ='2' then 'ДНЕВНОЙ СТАЦ' else cast('' as varchar) end as f2_stacType" +
                                 ",cast('' as varchar) as f3_depname, cast('' as varchar)  as f4_helpKind, cast('' as varchar)  as f5_doctorName ";
@@ -159,7 +182,7 @@
                                         " left join e2bill  bill on bill.id=e.bill_id " +
                                         " left join voce2medhelpprofile vmhp on vmhp.id=e.medhelpprofile_id" +
                                         " LEFT JOIN VocE2FondV025 v025 on v025.id=e.visitPurpose_id" +
-                                        " where bill.status_id =3 and e.entryType in ('SERVICE','POLYCLINIC') and e.finishDate between to_date('").append(dateBegin).append("','dd.MM.yyyy')" +
+                                        " where bill.status_id =3 ").append(addSql).append(" and e.entryType in ('SERVICE','POLYCLINIC') and e.finishDate between to_date('").append(dateBegin).append("','dd.MM.yyyy')" +
                                 " and to_date('").append(dateEnd).append("','dd.MM.yyyy') and (e.isDeleted is null or e.isDeleted='0') and (e.doNotSend is null or e.doNotSend='0')").append(defectSql)
                                 .append(" group by ").append(groupBySql).append(",v025.id, v025.name order by ").append(orderBySql).append(", v025.name ");
                         break;
@@ -170,7 +193,8 @@
                                 " from e2entry e" +
                                 " left join e2bill  bill on bill.id=e.bill_id " +
                                 " left join voce2medhelpprofile vmhp on vmhp.id=e.medhelpprofile_id" +
-                                " where bill.status_id =3 and e.entryType='").append(typeGroup).append("' and e.finishDate between to_date('").append(dateBegin).append("','dd.MM.yyyy')" +
+                                " left join vocksg ksg on ksg.id=e.ksg_id" +
+                                " where bill.status_id =3").append(addSql).append(" and e.entryType='").append(typeGroup).append("' and e.finishDate between to_date('").append(dateBegin).append("','dd.MM.yyyy')" +
                                 " and to_date('").append(dateEnd).append("','dd.MM.yyyy') and (e.isDeleted is null or e.isDeleted='0') and (e.doNotSend is null or e.doNotSend='0')").append(defectSql)
                         .append(" group by ").append(groupBySql).append(("VMP".equals(typeGroup) ? ", e.vmpkind " : "")).append(" order by ").append(orderBySql);
 
@@ -183,12 +207,11 @@
                                         " left join VocE2EntrySubType st on st.id=e.subtype_id").append(
                                         "5".equals(typeView) ? " left join entrymedservice ems on ems.entry_id = e.id left join vocmedservice vms on vms.id=ems.medservice_id" : "")
                                 .append(" left join voce2medhelpprofile vmhp on vmhp.id=e.medhelpprofile_id" +
-                                        " where bill.status_id =3 and e.entryType='").append(typeGroup).append("' and e.finishDate between to_date('").append(dateBegin).append("','dd.MM.yyyy')" +
+                                        " where bill.status_id =3 ").append(addSql).append(" and e.entryType='").append(typeGroup).append("' and e.finishDate between to_date('").append(dateBegin).append("','dd.MM.yyyy')" +
                                 " and to_date('").append(dateEnd).append("','dd.MM.yyyy') and (e.isDeleted is null or e.isDeleted='0') and (e.doNotSend is null or e.doNotSend='0')").append(defectSql)
                                 .append(" group by ").append(groupBySql).append( ", st.id, st.name " ).append(" order by ").append(orderBySql);
                 }
                 request.setAttribute("mainSql",sql.toString());
-              //  out.print("ssssl = "+sql.toString());
 
                 if (isReestr) {
         %>
@@ -196,7 +219,7 @@
         <msh:section>
             <msh:sectionTitle>Период с ${beginDate} по ${finishDate}</msh:sectionTitle>
             <msh:sectionContent>
-                <ecom:webQuery isReportBase="${isReportBase}" maxResult="1500"  name="journal_ticket" nativeSql="
+                <ecom:webQuery isReportBase="${isReportBase}" maxResult="1500" nameFldSql="journal_ticket_sql"  name="journal_ticket" nativeSql="
 select smo.id as name
 ,smo.dateStart as nameFld
 ,p.lastname||' '||p.firstname||' '||p.middlename as fio
@@ -251,7 +274,7 @@ LEFT JOIN VocWorkFunction ovwf on ovwf.id=owf.workFunction_id
 LEFT JOIN Worker ow on ow.id=owf.worker_id
 left join mislpu owflpu on owflpu.id=ow.lpu_id
 LEFT JOIN Patient owp on owp.id=ow.person_id
-WHERE  ${dtypeSql}
+WHERE  ${dtypeSql} ${addSql}
 and ${dateSql} BETWEEN TO_DATE('${beginDate}','dd.mm.yyyy') and TO_DATE('${finishDate}','dd.mm.yyyy')
 and (smo.noActuality is null or smo.noActuality='0')
 ${specialistSql} ${workFunctionSql} ${workFunctionGroupSql} ${lpuSql} ${serviceStreamSql} ${medServiceSql} ${workPlaceTypeSql} ${additionStatusSql} ${socialStatusSql}
@@ -260,7 +283,7 @@ group by ${groupOrder},smo.id,smo.dateStart,p.lastname,p.middlename,p.firstname,
 ,olpu.name,ovwf.name,owp.lastname,owp.firstname,owp.middlename,smo.patient_id,vss.code,owflpu.name
 
 ORDER BY ${groupOrder},p.lastname,p.firstname,p.middlename
-" />
+" />${journal_ticket_sql}
                 <msh:table printToExcelButton="Сохранить в excel"
                            name="journal_ticket" action="entitySubclassView-mis_medCase.do" idField="1" noDataMessage="Не найдено">
                     <msh:tableColumn columnName="#" property="sn"/>
@@ -291,7 +314,7 @@ ORDER BY ${groupOrder},p.lastname,p.firstname,p.middlename
             <msh:sectionContent>
 
                 <msh:table printToExcelButton="Сохранить в excel"
-                           name="journal_ticket" action="visit_report_service.do?typeReestr=1&typeDiag=${typeDiag}&typeView=${typeView}&typeDtype=${typeDtype}&typeEmergency=${typeEmergency}&typeDate=${typeDate}&typeGroup=${typeGroup}"
+                           name="journal_ticket" action="/javascript(void);visit_report_service.do?typeReestr=1&typeDiag=${typeDiag}&typeView=${typeView}&typeDtype=${typeDtype}&typeEmergency=${typeEmergency}&typeDate=${typeDate}&typeGroup=${typeGroup}"
                            idField="1" noDataMessage="Не найдено">
 
                     <msh:tableColumn columnName="#" property="sn"/>

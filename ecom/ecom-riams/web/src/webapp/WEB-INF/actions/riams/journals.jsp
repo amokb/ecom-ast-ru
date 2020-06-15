@@ -16,6 +16,9 @@
 				<div class='menu'>
 				<h2>Сообщения</h2>
 				<ul style='list-style: none outside none; '>
+					<li><msh:link roles='/Policy/Mis/MedCase/Covid19/Report' action="covid19_journal.do">
+						отчет по картам COVID
+					</msh:link></li>
 					<li><msh:link roles='/Policy/Mis/MedCase/Visit/Report039' action="journal_foreignPatients.do">
 						Отчет об оказанной помощи иногородними и иностранцам
 					</msh:link></li>
@@ -152,6 +155,9 @@
 						<li><msh:link  isReport="false" action="actRVKReport.do" roles="/Policy/Mis/MedCase/ActRVK/View">
 							Отчёт по актам РВК
 						</msh:link></li>
+						<li><msh:link  isReport="false" action="arrivedAO.do" roles="/Policy/Mis/MedCase/Coronavirus/ReportArrivedView">
+							Отчёт по лицам, въехавшим в АО, с СЛС либо направлением в ГБУЗ АО АМОКБ
+						</msh:link></li>
 					</ul>
 					</div>
 				</td>
@@ -264,6 +270,9 @@
 					<div class='menu'>
 					<h2>Стационар</h2>
 					<ul style='list-style: none outside none; '>
+						<li><msh:link isReport="true" action="/covid19_reg_journal.do" roles="/Policy/Mis/MedCase/Covid19/View">
+							Отчет - коронавирусные иногородние/иностранцы
+	                        </msh:link></li>
 						<li><msh:link isReport="true" action="/stac_admissionDoctorDiaryList.do" roles="/Policy/Mis/MedCase/Stac/Journal/HospitalByPeriod">
 							Журнал пациентов, осмотренных врачами приемного отделения
 	                        </msh:link></li>
@@ -399,6 +408,9 @@
 						</msh:link></li>
 						<li><msh:link  isReport="false" action="journal_noIdentSls.do" roles="/Policy/Mis/MedCase/Stac/Ssl/View">
 							Отчёт по неидентифицированным госпитализациям
+						</msh:link></li>
+						<li><msh:link  isReport="false" action="journal_bracelets.do" roles="/Policy/Mis/MedCase/Stac/Journal/BraceletsJournal">
+							Журнал браслетов
 						</msh:link></li>
 					</ul>
 					</div>

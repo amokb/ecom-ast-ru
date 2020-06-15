@@ -173,7 +173,7 @@
                 nameId="voc.code"
                 order="voc.name"
                 names="voc.name"
-                queried="voc.code like :querId or upper(voc.name) like upper(:query) "
+                queried="upper(voc.code) like upper(:query) or upper(voc.name) like upper(:query) "
         />
     </voc>
     <voc id="vocSocialStatusCode" type="NativeVocService">
@@ -462,8 +462,24 @@
                 queryConvertType="FIRST_LAT_UPPER"
         />
     </voc>
+    <!--  МКБ для формы COVID-->
+    <voc id='vocIdc10Covid' type='EntityVocService'>
+        <EntityVocService
+                entity  = 'ru.ecom.expomc.ejb.domain.med.VocIdc10'
+                names   = 'code,name'
+                queried = 'code,name'
+                queryAppend = "allowCovid='1'"
+                queryConvertType="FIRST_LAT_UPPER"
+        />
+    </voc>
     <voc id='visible' type='AllValueHelper'>
         <IAllValue>ru.ecom.ejb.services.voc.allvalues.YesNoAllValues</IAllValue>
+    </voc>
+    <voc id='positiveNegative' type='AllValueHelper'>
+        <IAllValue>ru.ecom.ejb.services.voc.allvalues.PositiveNegativeAllValues</IAllValue>
+    </voc>
+    <voc id='covidResultAllValues' type='AllValueHelper'>
+        <IAllValue>ru.ecom.ejb.services.voc.allvalues.CovidResultAllValues</IAllValue>
     </voc>
 
     <!-- КСГ -->
@@ -525,7 +541,7 @@
                 from = ' vocQualityEstimationChangeReason v '
                 names=" v.name "
                 nameId=" v.id "
-                queried=" ( upper(v.id) like upper(:query) or upper(v.name) like upper(:query) )"
+                queried=" ( cast(v.id as varchar) like cast(:query as varchar) or upper(v.name) like upper(:query) )"
                 join= ""
                 order=""
         />

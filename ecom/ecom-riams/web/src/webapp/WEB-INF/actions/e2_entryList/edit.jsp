@@ -5,16 +5,47 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 
 <tiles:insert page="/WEB-INF/tiles/mainLayout.jsp" flush="true">
+    <style>
+        #dropZone {
+            color: #555;
+            font-size: 18px;
+            text-align: center;
+
+            padding: 10px 0;
+            margin: 10px auto;
+
+            background: #eee;
+            border: 1px solid #ccc;
+
+            border-radius: 5px;
+        }
+
+        #dropZone.hover {
+            background: #ddd;
+            border-color: #aaa;
+        }
+
+        #dropZone.error {
+            background: #faa;
+            border-color: #f00;
+        }
+
+        #dropZone.drop {
+            background: #afa;
+            border-color: #0f0;
+        }
+    </style>
     <tiles:put name="title" type="string">
         <ecom:titleTrail mainMenu="Expert2" beginForm="e2_entryListForm" />
-
     </tiles:put>
     <tiles:put name="body" type="string">
         <msh:ifFormTypeIsView formName="e2_entryListForm">
+            <div style="display: none" id="dropZone"><p>Перетащите сюда файл для импорта</p></div>
         <select id="replaceSelect">
             <option value="SERVICESTREAM">Поток обслуживания</option>
             <option value="SNILS_DOCTOR">СНИЛС лечащего врача</option>
             <option value="SNILS_REPLACE_STRING">СНИЛСы из настроек</option>
+            <option value="MEDSERVICE_REPLACE_STRING">Мед.услуги из настроек</option>
         </select>
         <input type="text" name="replaceFrom" id="replaceFrom" placeholder="Заменить с">
         <input type="text" name="replaceTo" id="replaceTo" placeholder="Заменить на">
@@ -60,7 +91,7 @@
 
                 <ecom:webQuery name="entries" nameFldSql="entries_sql" nativeSql="select '${param.id}&entryType='||e.entryType||'&billDate='||
                     coalesce(''||to_char(e.billDate,'dd.MM.yyyy'),'')||'&billNumber='||coalesce(e.billNumber,'') ||'&serviceStream='||e.serviceStream
-                    ||'&isForeign='||case when e.isForeign='1' then '1' else '0' end||'&billComment='||coalesce(bill.comment,'')||'&fileType='||coalesce(e.fileType,'') as id
+                    ||'&isForeign='||case when e.isForeign='1' then '1' else '0' end||'&billComment='||coalesce(bill.comment,'')||'&fileType='||coalesce(e.fileType,'')||'&addGroupFld='||coalesce(e.addGroupFld,'') as id
                 ,e.entryType as f2
                 ,e.billDate as f3
                 ,e.billNumber||max(case when vocbill.id is not null then ' ('||vocbill.name||')' else '' end ) as f4
@@ -71,17 +102,19 @@
                 ,bill.comment as f9_billComment
                 ,coalesce(e.fileType,'') as f10_fileType
                 ,e.bill_Id||''','''||to_char(le.startDate,'dd.MM.yyyy')||' - '||to_char(le.finishDate,'dd.MM.yyyy')||''','''||split_part(bill.billnumber,'/',2)||'' as f11_printBill
+                ,coalesce(e.addGroupFld,'') as f12_groupFld
                  from e2listEntry le
                  left join e2entry e on e.listentry_id=le.id
                  left join e2bill bill on bill.id=e.bill_id
                  left join voce2billstatus vocbill on vocbill.id=bill.status_id
                 where le.id =${param.id} and (e.isDeleted is null or e.isDeleted='0')
-                group by e.entryType, e.billDate, e.billNumber ,e.serviceStream, e.isForeign,e.bill_id,bill.comment, e.fileType, le.startDate , le.finishDate, bill.billNumber,bill.sum
+                group by e.entryType, e.billDate, e.billNumber ,e.serviceStream, e.isForeign,e.bill_id,bill.comment, e.fileType, le.startDate , le.finishDate, bill.billNumber,bill.sum, e.addGroupFld
                  order by e.entryType, e.serviceStream, e.billDate, e.billNumber  "/>
 
                 <msh:table idField="1" name="entries" action="entityParentList-e2_entry.do"  noDataMessage="Нет записей по заполнению" >
                     <msh:tableColumn columnName="Тип записи" property="2"/>
                     <msh:tableColumn columnName="Тип файла" property="10"/>
+                    <msh:tableColumn columnName="Крит" property="12"/>
                     <msh:tableColumn columnName="иногородние" property="8"/>
                     <msh:tableColumn columnName="Источник финансирования" property="7"/>
                     <msh:tableColumn columnName="Дата счета" property="3"/>
@@ -94,7 +127,6 @@
                     <msh:tableButton property="1" buttonShortName="Присвоить счет" buttonFunction="showE2BillDialog" addParam="this" role="/Policy/E2/Admin"  />
                     <msh:tableButton property="1" buttonShortName="Сформировать пакет" buttonFunction="createMPFile" addParam="this" role="/Policy/E2/Admin" />
                     <msh:tableButton property="1" buttonShortName="Проверить случаи по записи" buttonFunction="makeCheck" addParam="this" role="/Policy/E2/Admin" />
-
                 </msh:table>
                 </msh:ifFormTypeIsView>
 
@@ -135,7 +167,82 @@
     <tiles:put name="javascript" type="string">
         <msh:ifFormTypeIsView formName="e2_entryListForm">
             <script type="text/javascript" src="./dwr/interface/Expert2Service.js"></script>
-            <script type="text/javascript">
+                <script type="text/javascript">
+                    jQuery(document).ready(function() {
+                        var dropZone = jQuery('#dropZone');
+                        var maxFileSize=30000000; //30Mb for test
+
+                        if (typeof(window.FileReader)=='undefined') {
+                            dropZone.html("Не поддерживается браузером");
+                            dropZone.addClass("error");
+                        } else {
+                            dropZone.show();
+                            dropZone[0].ondragover = function() {
+                                dropZone.addClass('hover');
+                                return false;
+                            };
+
+                            dropZone[0].ondragleave = function() {
+                                dropZone.removeClass('hover');
+                                return false;
+                            };
+                            dropZone[0].ondrop = function(event) {
+                                event.preventDefault();
+                                if (event.dataTransfer.files.length>1) {
+                                    alert("Импорт нескольких файлов пока невозможен. Загружайте по одному.");
+                                    return false;
+                                }
+                                let file = event.dataTransfer.files[0];
+                                dropZone.removeClass('hover');
+                                console.log("filename ="+file.name);
+                                let frm = new FormData();
+                                frm.append("file",file);
+                                let dirName ;
+                                let fileName = file.name.toUpperCase();
+                                if (fileName.startsWith("FLK_")) {
+                                    dirName = "importFlk";
+                                    console.log("import FLK");
+                                } else if (fileName.endsWith(".PAKET") || fileName.endsWith(".MP")) {
+                                    dirName="importDefect";
+                                } else if (fileName.startsWith("ELMED")) {
+                                    dirName="createEntry";
+                                } else {
+                                    alert("Неизвестный тип/имя файла:"+fileName);
+                                    return false;
+                                }
+
+                                dropZone.addClass('drop');
+                                frm.append("dirName",dirName);
+                                frm.append("objectId","${param.id}");
+                                frm.append("saveType","3");
+                                importFile("e2-ImportFile.do",frm, dropZone);
+
+                            };
+                        }
+                    });
+
+                function importFile(url, frm, dropZone) {
+
+                    jQuery.ajax({ //создаем сущность
+                        type: "POST"
+                        ,url:url
+                        ,data: frm
+                        ,processData: false
+                        ,dataType    : 'json'
+                        ,contentType : false,
+                    }).done (function(ret) {
+                        if (ret.monitorId) {
+                            dropZone.removeClass('drop');
+                            dropZone.addClass('hover');
+                            monitor.id=ret.monitorId;
+                            updateStatus();
+                        }
+                    }).fail( function (err) {
+                        console.error("ERROR ="+JSON.stringify(err));
+                    });
+                }
+
+
                 var monitor = {};
                 checkIsRunning();
 
@@ -254,20 +361,14 @@
                         alert('Проверка уже запущена, подождите!');
                         return;
                     }
-                 //   var oldVal =button.value;
                     button.value="Подождите...";
                     button.disabled=true;
                     isRun=true;
-                    var recalcKsg=false;
-                    if (confirm('Пересчитать КСГ для случаев с уже найденным КСГ?')) { recalcKsg=true;}
-                 //   if (button) {el.parentNode.removeChild(el);} //удалим элемент чтоб 2 раза не нажимали
+                    var recalcKsg = confirm('Пересчитать КСГ для случаев с уже найденным КСГ?');
                     Expert2Service.checkListEntry(${param.id},recalcKsg,params, {
                         callback: function(monitorId) {
                             monitor.id=monitorId;
                             jQuery.toast("Проверка запущена");
-                            //isRun=false;
-                            //button.disabled=false;
-                            //button.value=oldVal;
                             updateStatus();
                         }
                     });
@@ -290,9 +391,10 @@
                     var useAllListEntry = confirm("Формировать файл по счету по всем заполнениям?");
                     var ver = "3.2";
                     var fileType=a[7].split("=")[1];
+                  //  var addGroupFld=a[7].split("=")[1];
                //     if (confirm("2020?")) ver = "3.2";
                     Expert2Service.makeMPFIle(${param.id},type,billNumber,billDate, null,useAllListEntry,ver,
-                        fileType,{
+                        fileType, {
                         callback: function(monitorId) {
                             monitor ={};
                             monitor.id=monitorId;
@@ -342,7 +444,11 @@
                                 if (aStatus.finish) {
                                  txt="Завеpшено!";
                                  if (aStatus.finishedParameters) {
-                                     txt+=" <a href='"+aStatus.finishedParameters+"'>ПЕРЕЙТИ</a>";
+                                     if (aStatus.finishedParameters.startsWith("/")) {
+                                         txt+=" <a href='"+aStatus.finishedParameters+"'>ПЕРЕЙТИ</a>";
+                                     } else {
+                                         txt+=" > "+aStatus.finishedParameters;
+                                     }
                                  }
                                  monitor = {};
                                     isRun=false;

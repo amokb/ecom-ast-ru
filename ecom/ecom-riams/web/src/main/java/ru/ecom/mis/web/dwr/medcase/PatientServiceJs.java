@@ -20,6 +20,7 @@ import ru.nuzmsh.web.tags.helper.RolesHelper;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
@@ -27,6 +28,25 @@ import java.util.List;
 public class PatientServiceJs {
 
 	private static final Logger LOG = Logger.getLogger(PatientServiceJs.class);
+
+	public String getOpenHospByPatient(Long aMedCaseId, HttpServletRequest aRequest) throws NamingException, SQLException {
+		String sql = "select sls.id as hospId, coalesce(ss.code,'') as cardNumber, coalesce(pat.works,'') as workplace" +
+				" ,sls.patient_id as patient" +
+				" from medcase sls " +
+				" left join statisticstub ss on ss.medcase_id = sls.id" +
+				" left join patient pat on pat.id=sls.patient_id" +
+				" where sls.id="+aMedCaseId ;
+		IWebQueryService service = Injection.find(aRequest).getService(IWebQueryService.class);
+		return service.executeSqlGetJsonObject(sql);
+
+	}
+
+	public String markCovidAsSent(Long aCard, HttpServletRequest aRequest) throws NamingException {
+		IWebQueryService service = Injection.find(aRequest).getService(IWebQueryService.class);
+		String username = LoginInfo.find(aRequest.getSession(true)).getUsername() ;
+		return "обновлено " +service.executeUpdateNativeSql("update Covid19 set exportDate=current_date, exportTime=current_time" +
+				",exportUsername='"+username+"' where id="+aCard) +" карт";
+	}
 
 	public String getPhoneByPatientId(Long aPatientid, HttpServletRequest request) throws NamingException {
 		IWebQueryService service = Injection.find(request).getService(IWebQueryService.class);
@@ -346,18 +366,17 @@ public class PatientServiceJs {
 			sb.append("<div style='").append(wqr.get2().toString()).append("'>");
 			sb.append(wqr.get3().toString());
 			sb.append("</div>");
-			//sb.append(wqr.get1()).append("#").append(wqr.get2()).append("#").append(wqr.get3());
 		 }
 		 return sb.toString();
 	}
 
-	public String showPatientCheckByFondHistory(String aPatientId, String aType, HttpServletRequest aRequest) throws NamingException {
+	public String showPatientCheckByFondHistory(Long aPatientId, String aType, HttpServletRequest aRequest) throws NamingException {
 		 IWebQueryService service = Injection.find(aRequest).getService(IWebQueryService.class) ;
 		 StringBuilder ret = new StringBuilder();
 		 try {
 			 Object[] re = service.executeNativeSqlGetObj("select lastname, firstname, middlename, birthday, commonnumber from patient where id = "+aPatientId).get(0);
 			 String whereSql ;
-			 if (aType!=null&&aType.equals("1")) {
+			 if ("1".equals(aType)) {
 				 whereSql = "pf.lastname = '"+re[0]+"' and pf.firstname = '"+re[1]+"' and middlename = '"+re[2]+"' and pf.birthday = '"+re[3]+"'";
 			 } else {
 				 whereSql = "pf.commonnumber='"+re[4]+"'";
@@ -425,16 +444,16 @@ public class PatientServiceJs {
 		IPatientService service = Injection.find(aRequest).getService(IPatientService.class);
 		service.changeMedPolicyType(aPolicyId, aNewPolicyTypeId);
 	}
-	public boolean updateDataByFondAutomatic(String aPatientFondId, String aCheckId
+	public boolean updateDataByFondAutomatic(Long aPatientFondId, Long aCheckId
 			, boolean isUpdatePatient, boolean isUpdateDocument, boolean isUpdatePolicy, boolean isUpdateAttachment
 			, HttpServletRequest aRequest) throws NamingException {
 		IPatientService service = Injection.find(aRequest).getService(IPatientService.class);
-		return service.updateDataByFondAutomatic(Long.valueOf(aPatientFondId)
-				, Long.valueOf(aCheckId), isUpdatePatient, isUpdateDocument
+		return service.updateDataByFondAutomatic(aPatientFondId
+				, aCheckId, isUpdatePatient, isUpdateDocument
 				, isUpdatePolicy, isUpdateAttachment);
 		
 	}
-	public String checkAllPatients(String updPatient, String updDocument, String updPolicy,String updAttachment, String aType, String aPatientList,  HttpServletRequest aRequest) throws Exception {
+	public String checkAllPatients(String updPatient, String updDocument, String updPolicy,String updAttachment, String aType, String aPatientList,  HttpServletRequest aRequest) {
 		return FondWebService.checkAllPatientsByFond(updPatient, updDocument, updPolicy, updAttachment, aType, aPatientList, aRequest).toString();
 	}
 	public String checkDispAttached (Long aDispTypeId, Long aPatientId, HttpServletRequest aRequest) throws NamingException {
@@ -487,6 +506,7 @@ public class PatientServiceJs {
                 if (deathDate.length()==10) {
                     statusCode="2";
                     statusName= "По данным ФОМС на "+checkDate+" пациент умер "+deathDate;
+					service.executeUpdateNativeSql("update Patient set deathDate=to_date('"+deathDate+"','dd.mm.yyyy') where id='"+aPatientId+"'") ;
                 }
 			} else {
                 statusCode="0";
@@ -508,11 +528,10 @@ public class PatientServiceJs {
         }
     }
 
-	public String editColorType(Long aPatient,String aColorTypeCurrent, HttpServletRequest aRequest) throws NamingException  {
+	public void editColorType(Long aPatient,String aColorTypeCurrent, HttpServletRequest aRequest) throws NamingException  {
 		String colorType = aColorTypeCurrent!=null && aColorTypeCurrent.trim().equals("1") ? "0" : "1" ;
 		IWebQueryService service = Injection.find(aRequest).getService(IWebQueryService.class) ;
 		service.executeUpdateNativeSql("update Patient set colorType='"+colorType+"' where id='"+aPatient+"'") ;
-		return "сохранено" ;
 	}
 
 	public String checkPolicy(String aRoles,HttpServletRequest aRequest) throws JspException {

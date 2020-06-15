@@ -47,7 +47,6 @@ public class FinanceServiceBean implements IFinanceService {
             theManager.createNativeQuery(sql).executeUpdate();
             FinancePlan yearPlan;
             Calendar startFromCalendar = Calendar.getInstance();
-            //   Calendar lastCalendar = Calendar.getInstance();
             HashMap<Long, String> littleAmountMonth = new HashMap<>();
            HashMap<String, BigDecimal> caseCost= new HashMap<>();
             List<MonthLittleAmountTable> monthLittleAmountTables = theManager.createQuery("from MonthLittleAmountTable").getResultList();
@@ -307,8 +306,7 @@ return "good";
             Object newEntity = aClass.newInstance();
             for (Method setterMethod: methodList) {
                 if (setterMethod.getName().startsWith("set")) {
-                    if (setterMethod.getName().equals("setId")) {
-                    } else if (setterMethod.isAnnotationPresent(OneToMany.class)) {
+                    if (setterMethod.getName().equals("setId") || setterMethod.isAnnotationPresent(OneToMany.class)) {
                     } else {
                         String propertyName = PropertyUtil.getPropertyName(setterMethod);
                         try {

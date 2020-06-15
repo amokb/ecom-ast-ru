@@ -43,7 +43,7 @@ var map = new java.util.HashMap() ;
 /* Печать протокола КИЛИ */
 function printKiliProtocol (aCtx, aParams) {
 	//var id = new java.lang.Long(aParams.get("id"));
-	var protocolNumber = new java.lang.Long(aParams.get("protocolNumber"));
+	var protocolNumber = new java.lang.String(aParams.get("protocolNumber"));
 	var protocolDate = new java.lang.String(aParams.get("protocolDate"));
 	var profileName = "";
 	map.put("protocolNumber", protocolNumber);
@@ -254,6 +254,22 @@ function printCheckList (aCtx, aParams) {
 function unNull (aStr) {
 	return aStr!=null ? ""+aStr : "";
 }
+
+//печать листа назначений наркотиков
+function printDrugPrescriptList(aCtx, aParams) {
+	var username = aCtx.sessionContext.callerPrincipal.name ;
+	var id = new java.lang.Long(aParams.get("id"));
+	var list = aCtx.manager.createQuery("from DrugPrescription where prescriptionList_id=:id and createUsername=:username")
+		.setParameter("id",id).setParameter("username",username).getResultList();
+	map.put("presList",list);
+	map.put("presListSize",+list.size());
+	var prescriptionList = aCtx.manager.find(Packages.ru.ecom.mis.ejb.domain.prescription.PrescriptList,id);
+	var patient = prescriptionList.medCase.patient;
+	map.put("pat",patient);
+	return map;
+
+}
+
 function printPrescriptList(aCtx, aParams) {
     var mapTmp = new java.util.HashMap() ;
 	var id = new java.lang.Long(aParams.get("id"));
@@ -283,7 +299,7 @@ function printPrescriptList(aCtx, aParams) {
 				" ,vdm.name as f11_drugMethod" +
 				" from prescription p" +
 				" left join medservice ms on ms.id=p.medservice_id" +
-				" left join vocdrugclassify as dr on dr.id=p.drug_id" +
+				" left join vocdrug as dr on dr.id=p.vocDrug_id" +
 				" left join vocdrugmethod as vdm on vdm.id=p.method_id" +
 				" left join vocfrequencyunit as vfu on vfu.id=p.frequencyunit_id" +
 				" left join vocPrescriptOrderType as vpot on vpot.id=p.orderType_id" +
@@ -431,15 +447,13 @@ function printBloodTransfusionInfo(aCtx,aParams) {
 	map.put("pat",patient) ;
 	map.put("statCard",medCase.parent.statisticStub.code) ;
 	//Биологический тест
-	//lastrelease milamesher 02.04.2018 #95
+	//lastrelease milamesher 15.05.2020 #95
 	var biolTest = new java.lang.StringBuilder() ;
-    var bioprobe = aCtx.manager.createNativeQuery(new java.lang.StringBuilder().append(" select name from vocbloodbioprobprocedure vbp left join transfusion t on t.bloodbioprobprocedure_id=vbp.id where t.id=").append(id)).getResultList().get(0);
-    biolTest.append(bioprobe);
+	if (trans.getBloodBioProbProcedure()!=null)
+		biolTest.append(trans.getBloodBioProbProcedure().getName()).append(" ");
 	if (trans.getIsIllPatientsBT()!=null&&trans.getIsIllPatientsBT().booleanValue()==true) {
-		//biolTest.append("Проба на гемолиз (проба Бакстера). Перелито 30 мл. компонента крови струйно, взято 3 мл у реципиента, центрифугирована. Цвет сыворотки: ") ;
 		biolTest.append(trans.getSerumColorBT()!=null?trans.getSerumColorBT().getName():"_________") ;
 	} else {
-		//biolTest.append("Перелито 10 мл. компонента крови со скоростью 40-60 кап. в мин, 3 мин.-наблюдения. Данная процедура выполняется дважды.") ;
 		biolTest.append(" PS: ").append(trans.getPulseRateBT()) ;
 		biolTest.append(", AD: ").append(trans.getBloodPressureTopBT()).append("/").append(trans.getBloodPressureLowerBT()) ;
 		biolTest.append(", PS: ").append(trans.getRespiratoryRateBT()!=null?trans.getRespiratoryRateBT():"____") ;
@@ -2808,6 +2822,28 @@ function printDirectionHIV(aCtx, aParams) {
                 ret.add(par);
 			}
         }
+    }
+    map.put("listPat",ret) ;
+    return map;
+}
+
+//todo - гавно, переделать
+function printDirectionCovid(aCtx, aParams) {
+    var ret = new java.util.ArrayList() ;
+	var info = new java.lang.String(aParams.get("info"));
+	var infoMas=info.split('!');
+    for (var i=0; i<infoMas.length; i++) {
+        var row = infoMas[i].split('-');
+                var par = new Packages.ru.ecom.ejb.services.query.WebQueryResult();
+                par.set1("" + (i + 1));  //#
+                par.set2(row[0]);	//фио
+                par.set3(row[1]);	//дата начала
+                par.set4(row[2]);	//возраст
+                par.set5(row[3]);	//хз
+                par.set6(row[4]);	//хз
+                par.set7(row[5]);	//хз
+                par.set8(row[6]);	//хз
+                ret.add(par);
     }
     map.put("listPat",ret) ;
     return map;

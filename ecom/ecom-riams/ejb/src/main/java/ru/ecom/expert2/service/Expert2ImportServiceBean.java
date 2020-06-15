@@ -6,18 +6,17 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import ru.ecom.ejb.services.monitor.ILocalMonitorService;
+import ru.ecom.ejb.services.monitor.IMonitor;
 import ru.ecom.ejb.util.injection.EjbEcomConfig;
 import ru.ecom.expert2.domain.*;
 import ru.ecom.expert2.domain.voc.VocE2BillStatus;
 import ru.ecom.expert2.domain.voc.VocE2EntrySubType;
-import ru.ecom.expert2.domain.voc.VocE2MedHelpProfile;
 import ru.ecom.expert2.domain.voc.VocE2Sanction;
 import ru.ecom.expert2.domain.voc.federal.*;
 import ru.ecom.mis.ejb.domain.lpu.MisLpu;
 import ru.ecom.mis.ejb.domain.medcase.voc.VocMedService;
 import ru.ecom.mis.ejb.domain.worker.PersonalWorkFunction;
-import ru.nuzmsh.util.StringUtil;
-import ru.nuzmsh.util.format.DateFormat;
 
 import javax.annotation.EJB;
 import javax.ejb.Local;
@@ -69,36 +68,42 @@ public class Expert2ImportServiceBean implements IExpert2ImportService {
     }
 
     /*Импортируем ответ ФЛК от фонда*/
-    public String importFlkAnswer(String aFilename, Long aListEntryId) {
+    public void importFlkAnswer(long monitorId, String aFilename, Long aListEntryId) {
         LOG.info("start import FLK="+aFilename);
+        IMonitor monitor = startMonitor(monitorId,"Импортируем ФЛК "+aFilename+".");
         Document root = getDocumentFromFile(XMLDIR+"/",aFilename,true);
         XMLOutputter out = new XMLOutputter();
         Element rootElement = root.getRootElement();
         List<Element> defs = rootElement.getChildren("PR");
-        theManager.createNativeQuery("update e2entry set isdefect='0' where listentry_id=:id and (isdeleted is null or isdeleted='0')").setParameter("id",aListEntryId).executeUpdate();
-        LOG.info("clean defect before flk");
+        theManager.createNativeQuery("update e2entry set isdefect='0' where listentry_id=:id and (isdeleted is null or isdeleted='0')")
+                .setParameter("id",aListEntryId).executeUpdate();
+        LOG.info("clean defect before flk "+defs.size());
+        monitor.setText("ФЛК "+aFilename+", записей для расчета: "+defs.size());
         int cnt = 0;
         for (Element el:defs) {
-            String entryId =el.getChildText("N_ZAP");
+            String entryId = el.getChildText("N_ZAP");
+            if(cnt%100 == 0 && isMonitorCancel(monitor,"Импортировано записей: "+cnt)) return ;
             if (isNotNull(entryId)) {
-                E2Entry entry = theManager.find(E2Entry.class, Long.valueOf(entryId));
+                E2Entry entry = theManager.find(E2Entry.class, Long.parseLong(entryId));
                 entry.setFondComment(out.outputString(el));
                 entry.setIsDefect(true);
-                theManager.persist(new E2EntrySanction(entry,null, "FLK_ERR",true,"ФЛК"));
                 theManager.persist(entry);
+                theManager.persist(new E2EntrySanction(entry,null, "FLK_ERR",true,"ФЛК"));
                 cnt++;
             }
-
         }
-        return "ФЛК: Импортировано " + cnt + " записей из "+defs.size();
-
+        monitor.finish("Импорт ФЛК закончен: "+cnt + " записей из "+defs.size());
     }
 
     /*Импортируем файл с элмед*/
-    public String importElmed(String aXmlFilename) {
+    public void importElmed(long monitorId, String aXmlFilename) {
         try { //делаем только ДД
             Document doc = getDocumentFromFile(XMLDIR+"/",aXmlFilename,false);
-            if (doc == null) return "Не удается открыть файл "+aXmlFilename;
+            if (doc == null) {
+                LOG.error("Не удается открыть файл "+aXmlFilename);
+                return;
+            }
+
             E2ListEntry le = new E2ListEntry();
             le.setName("ELMED_"+aXmlFilename);
             String lpuCode="300052";
@@ -111,10 +116,11 @@ public class Expert2ImportServiceBean implements IExpert2ImportService {
             List<Element> zaps = root.getChildren("ZAP");
             E2Entry e;
             LOG.info("start import elmed "+aXmlFilename+", found "+zaps.size()+" records");
+            IMonitor monitor = startMonitor(monitorId,"Импортируем записи с ЭлМед-а {"+aXmlFilename+"}. Всего записей: "+zaps.size());
             for (Element zap : zaps) {
                 try {
                     i++;
-                    if (i%100==0) {LOG.info("improt " +i+" records");}
+                    if (i%100==0 && isMonitorCancel(monitor,"Импорт "+i+" записей")) break;
                     e = new E2Entry();
                     Element sl = zap.getChild("SL");
                     e.setListEntry(le);
@@ -179,9 +185,9 @@ public class Expert2ImportServiceBean implements IExpert2ImportService {
                     } else {
                         LOG.error("Нет докутора в ДД");
                         theManager.persist(e);
+                        monitor.setText("Нет докутора в записи "+e.getId());
                         theManager.persist(new E2EntryError(e,"NO_DISP_DOCTOR"));
                     }
-
 
                     e.setVisitPurpose(getVocByCode(VocE2FondV025.class, finishDate, sl.getChildText("P_CEL")));
                     e.setIDSP(getVocByCode(VocE2FondV010.class, finishDate, sl.getChildText("IDSP"))); //TODO
@@ -212,15 +218,15 @@ public class Expert2ImportServiceBean implements IExpert2ImportService {
                     }
 
                 } catch (Exception e1) {
+                    monitor.setText("Не удалось загрузить запись: "+new XMLOutputter().outputString(zap));
                     LOG.error(i+" Не удалось загрузить запись:"+new XMLOutputter().outputString(zap));
                 }
             }
             LOG.info("finish import elmed");
-                return "ok: " + i;
+            monitor.finish("Импорт записей с ЭлМед-а успешно завершен!");
 
         } catch (Exception e){
             LOG.error(e.getMessage(),e);
-            return null;
         }
     }
 
@@ -236,280 +242,150 @@ public class Expert2ImportServiceBean implements IExpert2ImportService {
         return workFunction;
     }
 
-    /*Создаем заполнение из MP файла*/
-    public String createEntryByFondXml(String aMpFilename) {
-        try {
-            E2ListEntry le = new E2ListEntry();
-            le.setName("IMPORT_"+aMpFilename);
-            theManager.persist(le);
-            String dir = unZip(aMpFilename);
-            String hFilename = aMpFilename.replace(".MP",".XML");
-            String lFilename="L"+hFilename.substring(1);
-            hFilename="H"+hFilename.substring(1);
-            Document doc = getDocumentFromFile(dir+"/",hFilename,false);
-            if (doc == null) return "Не удается открыть файл "+hFilename;
-            Element root = doc.getRootElement();
-            String ver = root.getChild("ZGLV").getChildText("VERSION");
-            SimpleDateFormat toFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Document patDoc = new SAXBuilder().build(new File(dir+"/"+lFilename));
-            List<Element> patients = patDoc.getRootElement().getChildren("PERS");
-            int i = 0;
-            if (ver.equals("3.0")) { //Импорт ответа в старом формате
-                //Только поликлиника.
-                Element eBill = root.getChild("SCHET");
-                String billDate = eBill.getChildText("DSCHET");
-                String billNumber = eBill.getChildText("NSCHET");
-                E2Bill bill = theExpertService.getBillEntryByDateAndNumber(billNumber, toFormat.parse(billDate));
-                if (eBill.getChild("SUMMAP")!=null) {
-                    BigDecimal sum = new BigDecimal(eBill.getChildText("SUMMAP"));
-                    bill.setSum(sum);
-                    theManager.persist(bill);
-                }
-
-                List<Element> zaps = root.getChildren("ZAP");
-                E2Entry e;
-                LOG.info("start import "+hFilename+", found "+zaps.size()+" records");
-                for (Element zap : zaps) {
-                    if (i%100==0) {LOG.info("improt " +i+" records");}
-                    i++;
-                    e = new E2Entry();
-                    e.setListEntry(le);
-                    Element pat = zap.getChild("PACIENT");
-                    Element sluch = zap.getChild("SLUCH");
-                    e.setMedPolicyType(pat.getChildText("VPOLIS"));
-                    e.setMedPolicyNumber(pat.getChildText(pat.getChildText("NPOLIS")));
-                    e.setInsuranceCompanyCode(pat.getChildText("SMO"));
-                    Date startDate = toDate(sluch.getChildText("DATE_1"));
-                    Date finishDate = toDate(sluch.getChildText("DATE_2"));
-                    pat = getPatient(patients, pat.getChildText("ID_PAC"));
-                    if (pat == null) continue;
-                    e.setLastname(pat.getChildText("FAM"));
-                    e.setFirstname(pat.getChildText("IM"));
-                    e.setMiddlename(pat.getChildText("OT"));
-                    e.setBirthDate(toDate(pat.getChildText("DR")));
-                    e.setSex(pat.getChildText("W"));
-                    if (isNotNull(sluch.getChildText("FAM_P"))) {
-                        e.setKinsmanLastname(pat.getChildText("FAM_P"));
-                        e.setKinsmanFirstname(pat.getChildText("IM_P"));
-                        e.setKinsmanMiddlename(pat.getChildText("OT_P"));
-                        e.setKinsmanBirthDate(toDate(pat.getChildText("DR_P")));
-                        e.setKinsmanSex(pat.getChildText("W_P"));
-                        e.setKinsmanSnils(pat.getChildText("SNILS"));
-                    } else {
-                        e.setPatientSnils(pat.getChildText("SNILS"));
-                    }
-                    e.setOkatoReg(pat.getChildText("OKATOG"));
-                    e.setCommonNumber(pat.getChildText("ENP"));
-                    e.setPassportType(pat.getChildText("DOCTYPE"));
-                    e.setPassportSeries(pat.getChildText("DOCSER"));
-                    e.setPassportNumber(pat.getChildText("DOCNUM"));
-
-                    e.setStartDate(startDate);
-                    e.setFinishDate(finishDate);
-                    e.setServiceStream("OBLIGATORYINSURANCE");
-                    e.setBill(bill);
-                    e.setBillNumber(bill.getBillNumber());
-                    e.setBillDate(bill.getBillDate());
-                    e.setMedHelpUsl(getVocByCode(VocE2FondV006.class, finishDate, sluch.getChildText("USL_OK")));
-                    e.setMedHelpKind(getVocByCode(VocE2FondV008.class, finishDate, sluch.getChildText("VIDPOM")));
-                    e.setIsEmergency(!sluch.getChildText("FOR_POM").equals("3"));
-                    e.setDirectLpu(sluch.getChildText("NPR_MO"));
-                    e.setIsMobilePolyclinic(sluch.getChildText("VBR").equals("1"));
-                    VocE2MedHelpProfile profile = getActualVocByCode(VocE2MedHelpProfile.class, finishDate, "profilek='" + sluch.getChildText("PROFIL_K") + "'");
-                    e.setMedHelpProfile(profile);
-                    e.setHistoryNumber(sluch.getChildText("NHISTORY"));
-                    e.setMainMkb(sluch.getChildText("DS1"));
-                    e.setFondResult(getVocByCode(VocE2FondV009.class, finishDate, sluch.getChildText("RSLT")));
-                    e.setFondIshod(getVocByCode(VocE2FondV012.class, finishDate, sluch.getChildText("ISHOD")));
-                    e.setFondDoctorSpecV021(getVocByCode(VocE2FondV021.class, finishDate, sluch.getChildText("PRVS")));
-                    e.setDoctorSnils(sluch.getChildText("IDDOKT"));
-                    e.setIDSP(getVocByCode(VocE2FondV010.class, finishDate, sluch.getChildText("IDSP")));
-                    e.setTotalCoefficient(new BigDecimal(sluch.getChildText("KOEF")));
-                    e.setCost(new BigDecimal(sluch.getChildText("SUMV")));
-                    theManager.persist(e);
-
-                }
-                return "ok: " + i;
-
-            } else {
-                LOG.error("Unknown version to import");
-            }
-
-            return "0";
-        }catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public String getConfigValue (String aKeyName, String aDefaultName) {
         return CONFIG.get(aKeyName,aDefaultName);
     }
 
-    /** Загружаем файл для проставления номеров направления ФОМС */
-    public String importN5File(Document doc, Long aListEntryId) {
-        try {
-            //Document doc = new SAXBuilder().build(aStream);
-            List<Element> npr = doc.getRootElement().getChildren("NPR");
-            LOG.info("Найдено "+npr.size()+" случаев");
-            int i=0;
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            for (Element el:npr) {
-                i++;
-                if (i%100==0) {LOG.info("Обработано "+i+" записей");}
-                String num = el.getChildText("N_NPR");
-                String planHospDate = el.getChildText("DATE_1");
-                String directDate = el.getChildText("D_NPR");
-                String historyNumber = el.getChildText("NHISTORY");
-                String sql = "from E2Entry where listentry_id=:listEntryId and historyNumber=:historyNumber and serviceStream='OBLIGATORYINSURANCE' and (isDeleted is null or isDeleted='0')";
-                List<E2Entry> list = theManager.createQuery(sql).setParameter("listEntryId",aListEntryId).setParameter("historyNumber",historyNumber).getResultList();
-                for (E2Entry entry: list) {
-                    if (sdf.format(entry.getStartDate()).equals(planHospDate)) {
-                        boolean persist = false;
-                        if (StringUtil.isNullOrEmpty(entry.getTicket263Number())) {
-                            entry.setTicket263Number(num);
-                            persist=true;
-                        }
-                        if (null==entry.getPlanHospDate()) {
-                            entry.setPlanHospDate(DateFormat.parseSqlDate(planHospDate,"yyyy-MM-dd"));
-                            persist=true;
-                        }
-                        if (null==entry.getDirectDate()) {
-                            entry.setDirectDate(DateFormat.parseSqlDate(directDate,"yyyy-MM-dd"));
-                            persist=true;
-                        }
-                        if (persist)theManager.persist(entry);
-                    }
-                }
-            }
-            LOG.info("Закончили импортировать N5");
-            return "success";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "error";
-
-        }
-    }
     /** Загружаем MP файл (ответ от фонда)
      * импорт версии от 2020 года
      * */
 
     private HashMap<String, VocE2Sanction> sanctionMap = new HashMap<>();
 
-    /*Загружаем ответ от фонда (версия файла {3.1, 3.0}*/
-    public String importFondMPAnswer(String aMpFilename) {
-        //filename вида *.mp *.mpi
-        //String outputDir = unZip(aMpFilename);
+    /*Загружаем ответ от фонда (версия файла {3.1}
+    * Добавляем импорт целиком пакета (*.paket)
+    * */
+    public void importFondMPAnswer(long monitorId, String aMpFilename) {
+        IMonitor monitor = startMonitor(monitorId,"Импорт дефектов. Файл: "+aMpFilename);
+        importFondMPAnswer(monitorId,aMpFilename,monitor);
+        monitor.finish("Закончили импорт дефектов");
+    }
+
+    private void importFondMPAnswer(long monitorId, String aMpFilename, IMonitor monitor) {
         try {
-            LOG.info("filename = "+aMpFilename);
-            String dir = unZip(aMpFilename);
-            String hFilename ="H"+aMpFilename.substring(aMpFilename.indexOf("M")).replace(".MP",".XML");
-            File hFile = new File(dir+"/"+hFilename);
-            //LOG.info(hFile.exists()+"##>>"+dir+"/"+hFilename+"<<");
-
-
-            Document doc = new SAXBuilder().build(hFile);
-        //    XmlDocument xmlDocError = new XmlDocument() ;
-            org.jdom.Element root = doc.getRootElement();
-            String ver = root.getChild("ZGLV").getChildText("VERSION");
-            if ("3.0".equals(ver)) {
-                throw new IllegalStateException("Импорт в старом формате более не поддерживается!");
-            }
-            List<Element> zaps= root.getChildren("ZAP");
-            Element schet = root.getChild("SCHET");
-            String nSchet = schet.getChildText("NSCHET");
-            String dSchet = schet.getChildText("DSCHET");
-            SimpleDateFormat fromFormat = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat toFormat = new SimpleDateFormat("dd.MM.yyyy");
-            java.sql.Date billDate = new java.sql.Date(fromFormat.parse(dSchet).getTime());
-            E2Bill bill = theManager.find(E2Bill.class,theExpertService.getBillIdByDateAndNumber(nSchet,toFormat.format(billDate)));
-            bill.setStatus(getActualVocByCode(VocE2BillStatus.class,null,"code='PAID'"));
-
-            int i=0;
-            LOG.info("Найдено "+zaps.size()+" записей. Обновляем!");
-            BigDecimal totalSum = new BigDecimal("0");
-
-            for (Element zap:zaps) {
-                i++;
-                if (i%100==0) {LOG.info("Обработано "+i+" записей");}
-                Element zsl = zap.getChild("Z_SL");
-                List<Element> slList = zsl.getChildren("SL");
-                Element pac = zap.getChild("PACIENT");
-                boolean isComplexCase=false;
-                for (Element sl: slList) {
-                    if (isComplexCase) break;
-                    Element slId = sl.getChild("SL_ID");
-                    Long entryId = Long.parseLong(slId.getText());
-                    E2Entry entry= theManager.find(E2Entry.class,entryId);
-                    if (entry==null || Boolean.TRUE.equals(entry.getIsDeleted())) {LOG.warn("Ошибка при импорте ответа от фонда - не найдена запись с ИД = "+entryId);continue;}
-                    if (entry.getParentEntry()!=null) {
-                        entry=entry.getParentEntry();
-                        isComplexCase=true;
+            LOG.info("filename = " + aMpFilename);
+            if (aMpFilename.toUpperCase().endsWith(".PAKET")) { //like B300026_200205.paket
+                //распаковываем в папку. Потом проходимся по каждому файлу в папке
+                File unpackedDir = new File(unZip(aMpFilename));
+                LOG.info("unpack paket " + unpackedDir.getAbsolutePath());
+                for (File mpFile : unpackedDir.listFiles()) {
+                    String filename = mpFile.getName();
+                    if (filename.toUpperCase().endsWith(".MP")) {
+                        monitor.setText("Импорт дефектов. Импортируем файл: "+filename);
+                        importFondMPAnswer(monitorId, unpackedDir.getName() + "/" + filename, monitor);
                     }
-                    //LOG.info(j+" record id "+entry.getId()+" ");
-                    theManager.createNativeQuery("delete from E2EntrySanction where entry_id=:entryId").setParameter("entryId",entryId).executeUpdate();
-                    entry.setBillNumber(nSchet);
-                    entry.setBillDate(billDate);
-                    entry.setBill(bill);
-
-                    //Проставляем данные о мед. полисе
-         /*           entry.setMedPolicyType(pac.getChildText("VPOLIS"));
-                    if (pac.getChild("SPOLIS")!=null) {entry.setMedPolicySeries(pac.getChildText("SPOLIS"));} else {entry.setMedPolicySeries("");}
-                    entry.setMedPolicyNumber(pac.getChildText("NPOLIS"));
-                    entry.setInsuranceCompanyCode(pac.getChildText("SMO"));
-`*/
-                    //Расчет цены случая ФОМС
-                    Element commentCalc = sl.getChild("D_COMMENT_CALC");
-                    if (commentCalc!=null && commentCalc.getChild("root")!=null) {
-
-                        Element ебаныйРусскийТэг = commentCalc.getChild("root");
-                        List<Element> ерт = ебаныйРусскийТэг.getChildren();
-                        StringBuilder commentError = new StringBuilder();
-                        for (Element еб:ерт) {
-                            commentError.append(еб.getName()).append(": ").append(еб.getText()).append("\n");
-                        }
-                        entry.setFondComment(commentError.toString());
-                    } else {
-                        entry.setFondComment("");
-                    }
-
-                    //Добавляем сведения о санкциях
-                    if (zsl.getChild("SANK_IT")!=null && !zsl.getChildText("SANK_IT").equals("0.00")) { //
-                        List<Element> sanks =zsl.getChildren("SANK") ;
-                        ArrayList<String> sanks1 = new ArrayList<>();
-                        for (Element sank: sanks) {
-                            String key = sank.getChildText("S_OSN") ;
-                            String dopCode = sank.getChildText("S_DOP");
-                            if (!sanks1.contains(dopCode)) {
-                                if (!sanctionMap.containsKey(key)) {
-                                    sanctionMap.put(key,getActualVocByCode(VocE2Sanction.class,null,"osn='"+key+"'"));
-                                }
-                                String comment = sank.getChildText("SL_ID")+" "+ sank.getChildText("S_COM");
-                                //   boolean isMain =  false; // sank.getChildText("S_SUM").equalsIgnoreCase("0.00")?false:true; // 27-08-2018
-                                theManager.persist(new E2EntrySanction(entry,sanctionMap.get(key),dopCode,false,comment));
-                                sanks1.add(dopCode);
-                            }
-                        }
-                        entry.setIsDefect(true);
-                    } else {
-                        totalSum=totalSum.add(entry.getCost());
-                        entry.setIsDefect(false);
-                        entry.setFondComment(null);
-                    }
-                    theManager.persist(entry);
                 }
-            }
-            LOG.info("По счету №"+bill.getBillNumber() +" сумма = "+totalSum);
-            bill.setSum(totalSum);
-            theManager.persist(bill);
-            LOG.info("Обновление закончено!");
+            } else {
+                String dir = unZip(aMpFilename);
+                String hFilename = "H" + aMpFilename.substring(aMpFilename.indexOf("M")).replace(".MP", ".XML");
+                File hFile = new File(dir + "/" + hFilename);
+                Document doc = new SAXBuilder().build(hFile);
+                org.jdom.Element root = doc.getRootElement();
+                String ver = root.getChild("ZGLV").getChildText("VERSION");
+                if ("3.0".equals(ver)) {
+                    throw new IllegalStateException("Импорт в старом формате более не поддерживается!");
+                }
+                List<Element> zaps = root.getChildren("ZAP");
+                Element schet = root.getChild("SCHET");
+                String nSchet = schet.getChildText("NSCHET");
+                String dSchet = schet.getChildText("DSCHET");
+                SimpleDateFormat fromFormat = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat toFormat = new SimpleDateFormat("dd.MM.yyyy");
+                java.sql.Date billDate = new java.sql.Date(fromFormat.parse(dSchet).getTime());
+                E2Bill bill = theManager.find(E2Bill.class, theExpertService.getBillIdByDateAndNumber(nSchet, toFormat.format(billDate)));
+                bill.setStatus(getActualVocByCode(VocE2BillStatus.class, null, "code='PAID'"));
+
+                int i = 0;
+                if (isMonitorCancel(monitor, "Найдено записей для импорта: " + zaps.size())) return;
+
+                BigDecimal totalSum = new BigDecimal("0");
+
+                for (Element zap : zaps) {
+                    i++;
+                    if (i % 100 == 0 && isMonitorCancel(monitor, "Загружено записей: " + i)) break;
+                    Element zsl = zap.getChild("Z_SL");
+                    List<Element> slList = zsl.getChildren("SL");
+                    Element pac = zap.getChild("PACIENT");
+                    boolean isComplexCase = false;
+                    for (Element sl : slList) {
+                        if (isComplexCase) break;
+                        Element slId = sl.getChild("SL_ID");
+                        Long entryId = Long.parseLong(slId.getText());
+                        E2Entry entry = theManager.find(E2Entry.class, entryId);
+                        if (entry == null || Boolean.TRUE.equals(entry.getIsDeleted())) {
+                            LOG.warn("Ошибка при импорте ответа от фонда - не найдена запись с ИД = " + entryId);
+                            continue;
+                        }
+                        if (entry.getParentEntry() != null) {
+                            entry = entry.getParentEntry();
+                            isComplexCase = true;
+                        }
+                        theManager.createNativeQuery("delete from E2EntrySanction where entry_id=:entryId").setParameter("entryId", entryId).executeUpdate();
+                        entry.setBillNumber(nSchet);
+                        entry.setBillDate(billDate);
+                        entry.setBill(bill);
+
+                        //Расчет цены случая ФОМС
+                        Element commentCalc = sl.getChild("D_COMMENT_CALC");
+                        if (commentCalc != null && commentCalc.getChild("root") != null) {
+
+                            Element ебаныйРусскийТэг = commentCalc.getChild("root");
+                            List<Element> ерт = ебаныйРусскийТэг.getChildren();
+                            StringBuilder commentError = new StringBuilder();
+                            for (Element еб : ерт) {
+                                commentError.append(еб.getName()).append(": ").append(еб.getText()).append("\n");
+                            }
+                            entry.setFondComment(commentError.toString());
+                        } else {
+                            entry.setFondComment("");
+                        }
+
+                        //Добавляем сведения о санкциях
+                        if (zsl.getChild("SANK_IT") != null && !zsl.getChildText("SANK_IT").equals("0.00")) { //
+                            List<Element> sanks = zsl.getChildren("SANK");
+                            ArrayList<String> sanks1 = new ArrayList<>();
+                            for (Element sank : sanks) {
+                                String key = sank.getChildText("S_OSN");
+                                String dopCode = sank.getChildText("S_DOP");
+                                if (!sanks1.contains(dopCode)) {
+                                    if (!sanctionMap.containsKey(key)) {
+                                        sanctionMap.put(key, getActualVocByCode(VocE2Sanction.class, null, "osn='" + key + "'"));
+                                    }
+                                    String comment = sank.getChildText("SL_ID") + " " + sank.getChildText("S_COM");
+                                    theManager.persist(new E2EntrySanction(entry, sanctionMap.get(key), dopCode, false, comment));
+                                    sanks1.add(dopCode);
+                                }
+                            }
+                            entry.setIsDefect(true);
+                        } else {
+                            entry.setIsDefect(false);
+                            entry.setFondComment(null);
+                        }
+                        totalSum = totalSum.add(entry.getCost());
+                        Element prikMo = zsl.getChild("D_PRIK_MO");
+                        if (prikMo!=null && isNotNull(prikMo.getText())) { //Проставляем информацию о прик. ЛПУ для формирования МУР
+                            entry.setAttachedLpu(prikMo.getText());
+                            entry.setAddGroupFld("МУР");
+
+                        } else {
+                            entry.setAttachedLpu("");
+                            entry.setAddGroupFld("");
+                        }
+                        theManager.persist(entry);
+                    }
+
+                }
+                LOG.info("По счету №" + bill.getBillNumber() + " сумма = " + totalSum);
+                monitor.setText("По счету №" + bill.getBillNumber() + " сумма = " + totalSum);
+                bill.setSum(totalSum);
+                theManager.persist(bill);
+                LOG.info("Обновление закончено!");
+        }
 
         }  catch (Exception e) {
-            e.printStackTrace();
+            monitor.error(e.getMessage(),e);
+            LOG.error(e.getMessage(),e);
         }
-        //Распаковываем mp файл в папку
-
-        return null;
     }
 
     /** распаковка архива */
@@ -620,8 +496,26 @@ public class Expert2ImportServiceBean implements IExpert2ImportService {
 
 
     }
+
+    /**Выводим сообщение в монитор. Возвращаем - отменен ли монитор*/
+    private boolean isMonitorCancel(IMonitor aMonitor, String aMonitorText) {
+        aMonitor.setText(aMonitorText);
+        LOG.info(aMonitorText);
+        if (aMonitor.isCancelled()) {
+            aMonitor.setText("Проверка прервана пользователем");
+            return true;
+        }
+        return false;
+    }
+
+    private IMonitor startMonitor(long monitorId, String message) {
+        return theMonitorService.startMonitor(monitorId,message,999);
+    }
     private @PersistenceContext
     EntityManager theManager;
     private @EJB
     IExpert2Service theExpertService;
+
+    private @EJB
+    ILocalMonitorService theMonitorService;
 }

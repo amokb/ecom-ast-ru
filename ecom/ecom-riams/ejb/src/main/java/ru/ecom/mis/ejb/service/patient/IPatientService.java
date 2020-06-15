@@ -15,13 +15,14 @@ import java.util.List;
 /**
  */
 public interface IPatientService {
+	Patient getPatient(String aLastname, String aFirstname, String aMiddlename, Date aBirthDay, String aSexCode, String aCommonNumber
+			, String addData);
 	String exportDispensaryCard(java.util.Date aDateFrom, java.util.Date aDateTo, java.util.Date aDateChanged, String aPacketNumber);
 	String getAddressByOkato (String aOkato, String aStreet);
 	void changeMedPolicyType (Long aPolicyId, Long aNewPolicyTypeId);
 	String updateOrCreateAttachment(Long aPatientId, String aCompany, String aLpu, String aAttachedType, String aAttachedDate
 			,String aDoctorSnils, boolean ignoreType, boolean updateEditDate);
 	void insertPatientNotFound(Long aPatientId, Long aCheckTimeId) throws ParseException;
-	boolean updateDataByFondAutomaticByFIO (String aLastName, String aFirstName, String aMiddleName, String aBirthday, Long aCheckTimeId,boolean needUpdatePatient, boolean needUpdateDocuments, boolean needUpdatePolicy, boolean needUpdateAttachment);
 	boolean updateDataByFondAutomatic (Long aPatientFondId, Long aCheckId
 			,boolean needUpdatePatient, boolean needUpdateDocuments, boolean needUpdatePolicy, boolean needUpdateAttachment);
 	PatientFondCheckData getNewPFCheckData(boolean aNeedUpdatePatient, boolean aNeedUpdateDocument, boolean aNeedUpdatePolicy, boolean aNeedUpdateAttachment);

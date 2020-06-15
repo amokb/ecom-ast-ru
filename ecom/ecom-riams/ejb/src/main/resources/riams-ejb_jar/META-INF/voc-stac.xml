@@ -402,16 +402,16 @@ left join vocBedSubType vbst on vbst.id=bf.bedSubType_id "
 				queryAppend="ms.finishDate is null and (code='A16.01.029' or code='A16.01.003' or code like 'A16.01.010.%' or code='A16.01.004' or code='A16.01.004.996')"
 		/>
 	</voc>
-    
-    <!-- Справочник осложнений -->
-    <voc id='vocComplication' type='EntityVocService'>
-        <EntityVocService
-                entity  = 'ru.ecom.mis.ejb.domain.medcase.voc.VocComplication'
-                names   = 'name'
-                queried = 'name'
-                />
-    </voc> 
-    <!-- Справочник отказов при госпитализации -->
+
+	<!-- Осложнение -->
+	<voc id='vocComplication' type='EntityVocService'>
+		<EntityVocService
+				entity  = 'ru.ecom.mis.ejb.domain.medcase.voc.VocComplication'
+				names   = 'name'
+				queried = 'code,name'
+		/>
+	</voc>
+	<!-- Справочник отказов при госпитализации -->
     <voc id='vocDeniedHospitalizating' type='EntityVocService'>
         <EntityVocService
                 entity  = 'ru.ecom.mis.ejb.domain.medcase.voc.VocDeniedHospitalizating'
@@ -869,12 +869,35 @@ left join vocBedSubType vbst on vbst.id=bf.bedSubType_id "
 				queried = 'name'
 		/>
 	</voc>
-	<!-- Справочники ппо кардиологическому скринингу -->
+	<!-- Справочники по кардиологическому скринингу -->
 	<voc id='vocScreeningSkin' type='EntityVocService'>
 		<EntityVocService
 				entity  = 'ru.ecom.mis.ejb.domain.birth.voc.VocScreeningSkin'
 				names   = 'name'
 				queried = 'id,name'
+		/>
+	</voc>
+	<!-- Справочники инфекционных отделений -->
+	<voc id='vocCovidLpu' type='NativeVocService'>
+		<NativeVocService
+				from="MisLpu"
+				names="name"
+				nameId="id"
+				queryAppend=" isforcovid=true "
+				order=""
+				queried=" (upper(name) like upper(:query)) "
+		/>
+	</voc>
+
+	<!-- Справочники рабочих функций для инф. отделения -->
+	<voc id='vocCovidWf' type='NativeVocService'>
+		<NativeVocService
+				from = 'VocWorkFunction voc '
+				names="voc.code||' '||voc.name"
+				nameId=" voc.id "
+				queried=" ( upper(voc.code) like upper(:query) or upper(voc.name) like upper(:query) )"
+				queryAppend=" isSuitForCovid=true "
+				order="voc.code"
 		/>
 	</voc>
 	<voc id='vocScreeningArterialPulsation' type='EntityVocService'>

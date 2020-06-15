@@ -120,7 +120,6 @@
                                   title='Медицинские осмотры'/>
                     <tags:QECriteria name="QECriteria" />
                     <msh:sideLink styleId="viewShort" action="/javascript:showQECriteriaCloseDocument(${param.id})" name='Критерии' title="Просмотр критериев" params="" roles="/Policy/Mis/MedCase/Visit/View" />
-                    <!--msh:sideLink styleId="viewShort" action="/javascript:viewAssessmentCardsByPatient('.do')" name="Карты оценки"  title="Показать все карты оценки" roles="/Policy/Mis/AssessmentCard/View"/-->
                     <tags:CardiacScreening name="CardiacScreening" />
                     <msh:sideLink styleId="viewShort" action="/javascript:showCardiacScreening(${param.id})" name='Кардиоскрининги новорождённых' title="Кардио-скрининги нов." params="" roles="/Policy/Mis/Pregnancy/CardiacScreening/View" />
                     <tags:identityPatient name="identityPatient" />
@@ -1140,11 +1139,12 @@ where m.id ='${param.id}'"/>
                                     var aResult = JSON.parse(res);
                                     var str='<table style="margin-left:45%"><tr>';
                                     for (var i=0; i<aResult.length; i++) {
-                                        var style = 'width: 30px;height: 30px;outline: 1px solid gray; border:2px; margin-right: 2px; margin-left: 2px;';
-                                        style+=aResult[i].picture!=''? '">':' background: '+aResult[i].colorCode +';">';
-                                        if (aResult[i].picture!='') style+='<img src="/skin/images/patology.png" title="Патология" height="30px" width="30px">';
-                                        var msg = aResult[i].info!=''? aResult[i].info : aResult[i].vsipnameJust;
-                                        str+='<td><div onclick="showToastMessage(\''+msg+'\',null,true,false);" title="'+aResult[i].vsipnameJust+'" style="'+style+'</div></td>';
+                                        var brace = aResult[i];
+                                        var msg = brace.info ? brace.info : brace.vsipnameJust;
+                                        var style = 'width: 40px;height: 40px;outline: 1px solid gray; border:2px; margin-right: 2px; margin-left: 2px;';
+                                        style+= brace.picture ? 'background-image: url(\'/skin/images/bracelet/'+brace.picture+'\');background-size: 40px 40px; '
+                                            :' background-color: '+brace.colorCode +';';
+                                        str+='<td><div onclick="showToastMessage(\''+msg+'\',null,true,false);" title="'+msg+'" style="'+style+'"></div></td>';
                                     }
                                     str+="</tr></table>";
                                     document.getElementById('mainFormLegend').parentNode.innerHTML=document.getElementById('mainFormLegend').parentNode.innerHTML.replace('<h2 id="mainFormLegend">Лечение в отделении</h2>',"<h2 id=\"mainFormLegend\">Лечение в отделении</h2>"+str);

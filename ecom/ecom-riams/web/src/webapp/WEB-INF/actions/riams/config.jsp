@@ -48,9 +48,6 @@
 							<li><msh:link roles="/Policy/Exp/Document/Edit" action="entityList-exp_importdocument.do">
 								Импорт
 							</msh:link></li>
-							<li><msh:link roles='/Policy/Exp/FillTime/View' action="entityList-exp_iterate.do">
-								Переборы
-							</msh:link></li>
 
 
 							<msh:ifInRole roles="/Policy/Stac/CustomizeMode/Edit">
@@ -68,12 +65,7 @@
 									</msh:link>
 								</li>
 							</msh:ifInRole>
-							<li>
-								<mis:linkCsp roles='/Policy/Mis/Worker/WorkCalendar/Edit'
-											 action="/impdoclist.csp">
-									Экспертиза
-								</mis:linkCsp>
-							</li>
+
 							<li><msh:link action="ecom_hibernateCacheConfig.do" roles="/Policy/Config/SystemAdmin">
 								Кэш для persistence.properties
 							</msh:link></li>
@@ -96,6 +88,9 @@
 							</li>
 							<li>
 								<msh:link action="/ecom_monitorList.do" >Список фоновых "мониторов"</msh:link>
+							</li>
+							<li>
+								<msh:link action="/javascript:readOldMessages()" >Отметить старые сообщения прочитанными</msh:link>
 							</li>
 
 						</ul>
@@ -252,10 +247,26 @@
                 }
             }
             function syncRecordTomorrow () {
-                var date = prompt('Введите дату направления',getTomorrowDateAfter());
+                var date = prompt('Введите дату направления',getDateAfterOrBeforeCurrent());
                 if (date!=null && date!='' && date!='dd.mm.yyyy') window.open('api/foncCheck/syncRecordTomorrow?dateStart='+date);
                 else window.open('api/foncCheck/syncRecordTomorrow');
             }
+
+            //Отметить сообщения прочитанными #201
+            function readOldMessages() {
+				var date = prompt('Введите дату. Все сообщения, созданные ранее этой даты, будут отмечены прочитанными: ',getDateAfterOrBeforeCurrent(getCurrentDate(),'.',-1));
+				if (date!=null && date!='' && date!='dd.mm.yyyy' && checkDate(date)) {
+					VocService.setMessagesReadBeforeDate(date, {
+						callback: function (num) {
+							showToastMessage("Прочитанными отмечено " + num + " сообщений до даты " + date,null,true,false,3000);
+						}
+					});
+				}
+				else if (date==null)
+					return;
+				else if (!checkDate(date))
+					showToastMessage("Некорректная дата " + date,null,true,true,3000);
+			}
 		</script>
 	</tiles:put>
 </tiles:insert>

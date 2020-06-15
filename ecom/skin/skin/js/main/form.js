@@ -183,7 +183,6 @@ function viewEmergencyUserMessage(aJsonId) {
 				,beforeShow: function () {checkEmergencyMessage(param.id);}
 				,stack:cnt
 			});
-	    	//alert("close json id = "+param.id);
 	    }
 	}
 }
@@ -326,10 +325,18 @@ function toDate(dateStr,sym) {
     var parts = dateStr.split(sym);
     return new Date(parts[2], parts[1] - 1, parts[0])
 }
-//dd - дата, следующую за которой надо получить
-function getTomorrowDateAfter(dateStr,sym) {
+
+/**
+ * Получить дату ранее или позднее полученной или текущей
+ * строка с датой или текущая
+ * sym символ-разделитель в строке
+ * razn разница, которую вычеть/прибавить
+ * @return Boolean true - если есть
+ */
+function getDateAfterOrBeforeCurrent(dateStr,sym,razn) {
     var tomorrow = typeof dateStr=='undefined'? new Date() : toDate(dateStr,sym);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    if (typeof razn=='undefined') razn=1;
+    tomorrow.setDate(tomorrow.getDate() + razn);
     var dd = tomorrow.getDate();
     var mm = tomorrow.getMonth() + 1;
     var yyyy = tomorrow.getFullYear();
@@ -458,76 +465,80 @@ function sortMshTable(th,num) {
     var rows, switching, i, x, y, shouldSwitch;
     switching = true;
     rows = table.rows;
-    if (rows.length < 100 || confirm('Таблица содержит много строк! Сортировка может занять много времени. Вы уверены?')) {
-        var j= rows[rows.length - 1].getElementsByTagName("TD").length>1 ? 1 : 0; //первый столбец мб пустым
-        var last = rows[rows.length - 1].getElementsByTagName("TD")[j].className.indexOf('sumTd') != -1 ? 2 : 1;
-        while (switching) {
-            switching = false;
-            for (i = 1; i < (rows.length - last); i++) {
-                shouldSwitch = false;
-                x = rows[i].getElementsByTagName("TD")[num];
-                y = rows[i + 1].getElementsByTagName("TD")[num];
-                if (x != null && y != null && typeof x !== 'undefined' && typeof y !== 'undefined') {
-                    if (x.innerHTML==' ' && y.innerHTML!=' ' && direct==0 || x.innerHTML!=' ' && y.innerHTML==' ' && direct!=0) {
-                        shouldSwitch = true;
-                        break;
-                    }
-                    if (isNaN(x.innerHTML)) {
-                        if (direct == 0) {
-                            if (checkDate(x.innerHTML) && checkDate(y.innerHTML)) { //если даты
-                                if (compareDates(x.innerHTML, y.innerHTML) == -1) {
-                                    shouldSwitch = true;
-                                    break;
+    VocService.getSoftConfigByValue("smallSortMshTableLength",100, {
+        callback: function (smallSortLength) {
+            if (rows.length < smallSortLength || confirm('Таблица содержит много строк! Сортировка может занять много времени. Вы уверены?')) {
+                var j= rows[rows.length - 1].getElementsByTagName("TD").length>1 ? 1 : 0; //первый столбец мб пустым
+                var last = rows[rows.length - 1].getElementsByTagName("TD")[j].className.indexOf('sumTd') != -1 ? 2 : 1;
+                while (switching) {
+                    switching = false;
+                    for (i = 1; i < (rows.length - last); i++) {
+                        shouldSwitch = false;
+                        x = rows[i].getElementsByTagName("TD")[num];
+                        y = rows[i + 1].getElementsByTagName("TD")[num];
+                        if (x != null && y != null && typeof x !== 'undefined' && typeof y !== 'undefined') {
+                            if (x.innerHTML==' ' && y.innerHTML!=' ' && direct==0 || x.innerHTML!=' ' && y.innerHTML==' ' && direct!=0) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                            if (isNaN(x.innerHTML)) {
+                                if (direct == 0) {
+                                    if (checkDate(x.innerHTML) && checkDate(y.innerHTML)) { //если даты
+                                        if (compareDates(x.innerHTML, y.innerHTML) == -1) {
+                                            shouldSwitch = true;
+                                            break;
+                                        }
+                                    }
+                                    else if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                                        shouldSwitch = true;
+                                        break;
+                                    }
+                                }
+                                else {
+                                    if (checkDate(x.innerHTML) && checkDate(y.innerHTML)) { //если даты
+                                        if (compareDates(x.innerHTML, y.innerHTML) == 1) {
+                                            shouldSwitch = true;
+                                            break;
+                                        }
+                                    }
+                                    else if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                                        shouldSwitch = true;
+                                        break;
+                                    }
                                 }
                             }
-                            else if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                                shouldSwitch = true;
-                                break;
-                            }
-                        }
-                        else {
-                            if (checkDate(x.innerHTML) && checkDate(y.innerHTML)) { //если даты
-                                if (compareDates(x.innerHTML, y.innerHTML) == 1) {
-                                    shouldSwitch = true;
-                                    break;
+                            else if (!isNaN(x.innerHTML)) {
+                                if (direct == 0) {
+                                    if (+x.innerHTML < (+y.innerHTML)) {
+                                        shouldSwitch = true;
+                                        break;
+                                    }
+                                }
+                                else {
+                                    if (+x.innerHTML > (+y.innerHTML)) {
+                                        shouldSwitch = true;
+                                        break;
+                                    }
                                 }
                             }
-                            else if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                                shouldSwitch = true;
-                                break;
-                            }
                         }
                     }
-                    else if (!isNaN(x.innerHTML)) {
-                        if (direct == 0) {
-                            if (+x.innerHTML < (+y.innerHTML)) {
-                                shouldSwitch = true;
-                                break;
-                            }
+                    if (shouldSwitch) {
+                        if (th.className.indexOf('thSorted')==-1) {
+                            th.className += ' thSorted ';
+                            uncheckTh(th,num);
                         }
-                        else {
-                            if (+x.innerHTML > (+y.innerHTML)) {
-                                shouldSwitch = true;
-                                break;
-                            }
-                        }
+                        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                        switching = true;
                     }
                 }
-            }
-            if (shouldSwitch) {
-                if (th.className.indexOf('thSorted')==-1) {
-                    th.className += ' thSorted ';
-                    uncheckTh(th,num);
-                }
-                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                switching = true;
+                direct = direct == 0 ? 1 : 0;
+                th.setAttribute('name', direct);
+                if (th.getElementsByTagName('i').length > 0)
+                    th.getElementsByTagName('i')[0].className = direct == 0 ? 'arrow arrowUp' : 'arrow arrowDown';
             }
         }
-        direct = direct == 0 ? 1 : 0;
-        th.setAttribute('name', direct);
-        if (th.getElementsByTagName('i').length > 0)
-            th.getElementsByTagName('i')[0].className = direct == 0 ? 'arrow arrowUp' : 'arrow arrowDown';
-    }
+    });
 }
 
 //мерцание строки с непрочитанными сообщениями
@@ -535,7 +546,7 @@ var colorArrays=new Array("#CD5C5C", "#7CFC00", "#00FFFF", "#7B68EE", "#00008B",
 var numColor=0;
 // эта функция будет менять цвет текста
 function blinkUnreadMsgs() {
-    if (+document.getElementById('unreadMsg').innerText > 0) {
+    if (+jQuery('#unreadMsg').text() > 0) {
         document.getElementById("clorRow").style.backgroundColor = colorArrays[numColor++];
         if (numColor > colorArrays.length) numColor = 0;
         setTimeout("blinkUnreadMsgs()", 300);
@@ -548,7 +559,7 @@ function blinkUnreadMsgs() {
 function getCountUnreadMessages() {
     VocService.getCountUnreadMessages('', {
         callback: function(aCnt) {
-            document.getElementById('unreadMsg').innerText=aCnt;
+            jQuery('#unreadMsg').text(aCnt);
             if (aCnt>0) {
                 blinkUnreadMsgs();
                 jQuery('clorRow').click(function() {
@@ -557,10 +568,73 @@ function getCountUnreadMessages() {
             }
         }
         , errorHandler:function(message) {
-            document.getElementById('unreadMsg').innerText='-1';
+            jQuery('#unreadMsg').text('-1');
             jQuery('clorRow').click(function() {
                 return false;
             });
         }
     } ) ;
     setTimeout("getCountUnreadMessages()",theDefaultTimeOutCountMsg);}
+
+    //поиск или создание человека по данным, полученным с эл. полиса ОМС
+    function findOrCreatePatientEveryWhere(jsonData) {
+        VocService.createOrGetPatient(jsonData, {
+            callback: function (ret) {
+                ret = JSON.parse(ret);
+                if (ret.status==='error') {
+                    return;
+                }
+                window.document.location = ret.link;
+            }
+        });
+    }
+
+/**
+ * Вывести браслеты в таблице #151
+ * @param table Таблица
+ * @param tdResNum Номер столбца для вывода результата
+ * @param tdJsonNum Номер столбца с json
+ */
+function setBr(table, tdResNum, tdJsonNum) {
+    if (typeof table !== 'undefined') {
+        for (var i = 1; i < table.rows.length; i++) {
+            var row = table.rows[i];
+            var tdRes=row.cells[tdResNum];
+            var td=row.cells[tdJsonNum];
+            var json = jQuery(td).text();
+            var str = "";
+            if (+json!=0) {
+                var aResult = JSON.parse(json);
+                str = '<table><tr>';
+                var size = 25;
+                for (var j = 0; j < aResult.length; j++) {
+                    var brace = aResult[j];
+                    var msg = brace.info ? brace.info : brace.vsipnamejust;
+                    var style = 'style="width:' + size + 'px;height: ' + size + 'px;outline: 1px solid gray; border:2px;';
+                    style += brace.picture ? '">' : ' background: ' + brace.colorcode + ';">';
+                    if (brace.picture)
+                        style += '<img src="/skin/images/bracelet/' + brace.picture + '" title="' + brace.vsipnamejust +
+                            '" height="' + size + 'px" width="' + size + 'px">';
+                    str += '<td><div title="' + msg + '" ' + style + '</div></td>';
+                }
+                str += "</tr></table>";
+            }
+            tdRes.innerHTML = str == '' ? '-' : str
+        }
+    }
+}
+
+/**
+ * Получить таблицу по className строки (название sql-запроса) #151
+ * @param sqlListName
+ * @return Таблица
+ */
+function getTableToSetBracelets(sqlListName) {
+    var tables = document.getElementsByTagName('table');
+    for (var i=0; i<tables.length; i++) {
+        var table = tables[i];
+        if (table.rows.length>1 && table.rows[1].className.indexOf(sqlListName)!=-1)
+            return table;
+    }
+    return null;
+}

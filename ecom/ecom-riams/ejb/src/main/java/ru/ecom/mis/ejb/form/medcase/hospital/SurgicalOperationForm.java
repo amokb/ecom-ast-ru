@@ -5,7 +5,6 @@ import ru.ecom.ejb.services.entityform.WebTrail;
 import ru.ecom.ejb.services.entityform.annotation.PersistManyToManyOneProperty;
 import ru.ecom.ejb.services.entityform.interceptors.*;
 import ru.ecom.mis.ejb.domain.medcase.SurgicalOperation;
-import ru.ecom.mis.ejb.domain.medcase.voc.VocComplication;
 import ru.ecom.mis.ejb.domain.worker.WorkFunction;
 import ru.ecom.mis.ejb.form.medcase.MedCaseForm;
 import ru.ecom.mis.ejb.form.medcase.hospital.interceptors.SurgicalOperationCreateInterceptor;
@@ -37,8 +36,8 @@ import javax.persistence.Id;
 public class SurgicalOperationForm extends IdEntityForm{
 	/** Дата операции */
 	@Comment("Дата операции")
-	@Persist @Required @MaxDateCurrent
-	@DateString @DoDateString
+	@Persist @Required
+	@DateString @DoDateString @MaxDateCurrent
 	public String getOperationDate() {return theOperationDate;}
 	public void setOperationDate(String aOperationDate) {theOperationDate = aOperationDate;	}
 
@@ -107,13 +106,7 @@ public class SurgicalOperationForm extends IdEntityForm{
 	@Persist
 	public Long getPatient() {return thePatient;}
 	public void setPatient(Long aPatient) {thePatient = aPatient;}
-	
-	/** Осложнения */
-	@Comment("Осложнения")
-	@Persist @PersistManyToManyOneProperty(collectionGenericType=VocComplication.class)
-	public String getComplications() {return theComplications;	}
-	public void setComplications(String aComplications) {theComplications = aComplications;}
-	
+
 	/** Лечебное учреждение */
 	@Comment("Лечебное учреждение")
 	@Persist
@@ -126,17 +119,10 @@ public class SurgicalOperationForm extends IdEntityForm{
 	public String getAnesthesiaAmount() {return theAnesthesiaAmount;}
 	public void setAnesthesiaAmount(String aAnesthesiaAmount) {theAnesthesiaAmount = aAnesthesiaAmount;}
 
-	///** Рабочая функция врача, проводившего операцию */
-	//@Comment("Рабочая функция врача, проводившего операцию")
-	//@Persist @Required
-	//public Long getSurgeonFunction() {return theSurgeonFunction;}
-	//public void setSurgeonFunction(Long aSurgeonFunction) {theSurgeonFunction = aSurgeonFunction;}
-	
 	/** Дата операции по */
 	@Comment("Дата операции по")
-	@DateString
-	@DoDateString
-	@Persist  @MaxDateCurrent @Required
+	@DateString @DoDateString @MaxDateCurrent
+	@Persist
 	public String getOperationDateTo() {return theOperationDateTo;}
 	public void setOperationDateTo(String aOperationDateTo) {theOperationDateTo = aOperationDateTo;}
 
@@ -200,8 +186,7 @@ public class SurgicalOperationForm extends IdEntityForm{
 	/** Время операции по */
 	@Comment("Время операции по")
 	@Persist
-	@TimeString
-	@DoTimeString @Required
+	@TimeString @DoTimeString
 	public String getOperationTimeTo() {return theOperationTimeTo;}
 	public void setOperationTimeTo(String aOperationTimeTo) {theOperationTimeTo = aOperationTimeTo;}
 
@@ -332,8 +317,6 @@ public class SurgicalOperationForm extends IdEntityForm{
 	
 	/** Лечебное учреждение */
 	private Long theLpu;
-	/** Осложнения */
-	private String theComplications;
 	/** Пациент */
 	private Long thePatient;
 	/** Случай медицинского обслуживания */
@@ -552,4 +535,12 @@ public class SurgicalOperationForm extends IdEntityForm{
 	public void setSecondDoseTime(String aSecondDoseTime) {theSecondDoseTime = aSecondDoseTime;	}
 	/** Время повторной (при необходимости) дозы */
 	private String theSecondDoseTime;
+
+	/** данные для сохранения осложнений*/
+	public String getAllComps() {
+		return theAllComps;
+	}
+	public void setAllComps(String aAllComps) { theAllComps = aAllComps; }
+	/** данные для сохранения осложнений*/
+	private String theAllComps;
 }
