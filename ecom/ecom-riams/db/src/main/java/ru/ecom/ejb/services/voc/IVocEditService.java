@@ -1,0 +1,24 @@
+package ru.ecom.ejb.services.voc;
+
+import ru.nuzmsh.util.voc.VocAdditional;
+import ru.nuzmsh.util.voc.VocValue;
+
+/**
+ * Редактирование справочника
+ */
+public interface IVocEditService {
+
+	/**
+	 * Создание нового значения
+	 * @param aVocKey справочник
+	 * @return идентификатор нового значения
+	 */
+	Object createVocValue(String aVocKey, VocValue aVocValue, VocAdditional aAdditional) ;
+	
+	/**
+	 * Можно ли редактировать справочник
+	 * @param aVocKey справочник
+	 * @return true если можно
+	 */
+	boolean isVocEditabled(String aVocKey) ;
+}

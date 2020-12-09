@@ -43,48 +43,45 @@ import java.util.Map;
 public class TemplateProtocolServiceBean implements ITemplateProtocolService {
 	private static final Logger LOG = Logger.getLogger(TemplateProtocolServiceBean.class);
 
-	public String makePOSTRequest (String data, String address,String aMethod, Map<String,String> params, Long aObjectId , EntityManager aManager) {
-		//LOG.info("create connection, address = "+address+",method = "+aMethod+" , data="+data);
-		if (address==null) {
-			return "";
-		}
-		HttpURLConnection connection = null;
-		try {
-			URL url = new URL(address+"/"+aMethod);
-			connection = (HttpURLConnection) url.openConnection();
-			if (params!=null&&!params.isEmpty()) {
-				for (Map.Entry<String,String> par: params.entrySet()) {
-				//	LOG.info("send HTTP request. Key = "+par.getKey()+"<< value = "+par.getValue());
-					connection.setRequestProperty(par.getKey(),par.getValue());
+	public void makePOSTRequest(String data, String address, String aMethod, Map<String, String> params) {
+		if (address != null) {
+			HttpURLConnection connection = null;
+			try {
+				URL url = new URL(address + "/" + aMethod);
+				connection = (HttpURLConnection) url.openConnection();
+				if (params != null && !params.isEmpty()) {
+					for (Map.Entry<String, String> par : params.entrySet()) {
+						connection.setRequestProperty(par.getKey(), par.getValue());
+					}
 				}
-			}
-			connection.setDoInput(true);
-			connection.setDoOutput(true);
-			connection.setRequestProperty("Accept", "application/json");
-			connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-			connection.setRequestProperty("Content-Type", "application/json");
-			OutputStream writer = connection.getOutputStream();
-			writer.write(data.getBytes("UTF-8"));
-			writer.flush();
-			writer.close();
-			StringBuilder response = new StringBuilder();
-			try(BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-				String s;
-				while ((s = in.readLine()) != null) {
-					response.append(s);
+				connection.setDoInput(true);
+				connection.setDoOutput(true);
+				connection.setRequestProperty("Accept", "application/json");
+				connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+				connection.setRequestProperty("Content-Type", "application/json");
+				OutputStream writer = connection.getOutputStream();
+				writer.write(data.getBytes("UTF-8"));
+				writer.flush();
+				writer.close();
+				StringBuilder response = new StringBuilder();
+				try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+					String s;
+					while ((s = in.readLine()) != null) {
+						response.append(s);
+					}
 				}
-			}
-			connection.disconnect();
-			return response.toString();
+				connection.disconnect();
 
-		} catch (ConnectException e) {
-			LOG.error("Ошибка соединения с сервисом. "+e);
-		} catch (Exception e) {
-			if (connection!=null) {connection.disconnect();}
-			LOG.error("in thread happens exception"+e);
-			e.printStackTrace();
+			} catch (ConnectException e) {
+				LOG.error("Ошибка соединения с сервисом. " + e);
+			} catch (Exception e) {
+				if (connection != null) {
+					connection.disconnect();
+				}
+				LOG.error("in thread happens exception" + e);
+				e.printStackTrace();
+			}
 		}
-		return "";
 	}
 
 	public static String saveParametersByProtocol(Long aSmoId,Protocol d, String aParams, String aUsername, EntityManager aManager) {

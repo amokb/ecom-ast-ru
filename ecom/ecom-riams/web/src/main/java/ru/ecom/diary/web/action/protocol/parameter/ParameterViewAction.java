@@ -19,8 +19,6 @@ import ru.ecom.web.util.Injection;
 
 public class ParameterViewAction extends ParameterEditAction {
     public ActionForward myExecute(ActionMapping aMapping, ActionForm aForm, HttpServletRequest aRequest, HttpServletResponse aResponse) throws Exception {
-        /*BaseValidatorForm form = (BaseValidatorForm) aForm ;
-        form.setTypeViewOnly();*/
 		IParameterService service = Injection.find(aRequest).getService(IParameterService.class) ;
 		 IEntityFormService entityService = EntityInjection.find(aRequest).getEntityFormService();
 	        IEntityForm form = castEntityForm(aForm, aMapping) ;

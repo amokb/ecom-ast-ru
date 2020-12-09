@@ -9,7 +9,6 @@ import org.apache.struts.action.ActionMapping;
 
 
 import ru.ecom.mis.ejb.service.diary.IParameterService;
-import ru.ecom.mis.ejb.service.medcase.IReportsService;
 import ru.ecom.web.util.Injection;
 import ru.nuzmsh.web.struts.BaseAction;
 

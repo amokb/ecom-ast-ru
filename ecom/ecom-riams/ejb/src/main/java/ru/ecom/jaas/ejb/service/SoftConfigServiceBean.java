@@ -2,6 +2,7 @@ package ru.ecom.jaas.ejb.service;
 
 import org.apache.log4j.Logger;
 import ru.ecom.ejb.util.injection.EjbEcomConfig;
+import ru.ecom.ejb.util.injection.EjbInjection;
 import ru.ecom.jaas.ejb.domain.SoftConfig;
 
 import javax.annotation.Resource;
@@ -20,7 +21,8 @@ import java.util.TreeMap;
 @Remote(ISoftConfigService.class )
 public class SoftConfigServiceBean implements ISoftConfigService {
 	private static final Logger LOG = Logger.getLogger(SoftConfigServiceBean.class);
-	public static String getDefaultParameterByConfig(String aParameter, String aValueDefault, EntityManager aManager) {
+	@Override
+	public String getDefaultParameterByConfig(String aParameter, String aValueDefault, EntityManager aManager) {
 		List<Object[]> l = aManager.createNativeQuery("select sf.id,sf.keyvalue from SoftConfig sf where  sf.key=:key").setParameter("key",aParameter).getResultList();
 		return l.isEmpty() ? aValueDefault : l.get(0)[1].toString();
 	}
@@ -98,6 +100,8 @@ public class SoftConfigServiceBean implements ISoftConfigService {
 		}
 		return null ;
 	}
+
+
 	
 	private Map<String, String> create() {
 		Map<String, String> map = new TreeMap<>();

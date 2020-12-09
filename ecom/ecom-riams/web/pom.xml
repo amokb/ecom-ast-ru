@@ -36,11 +36,10 @@
         </dependency>
         <dependency>
             <groupId>ru.ecom</groupId>
-            <artifactId>riams-ejb</artifactId>
-            <systemPath>${libdir}/ecom/riams/ejb/riams-ejb-api.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
+            <artifactId>riams-db</artifactId>
+            <version>2020</version>
         </dependency>
+
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>rs</artifactId>

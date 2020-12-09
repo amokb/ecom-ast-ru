@@ -37,7 +37,8 @@ public class ContractServiceBean implements IContractService {
 	private static final Logger LOG = Logger.getLogger(ContractServiceBean.class);
 
 	/*Возвращаем лимит по гарантийному письму, остаток и израсходованную сумму*/
-	public String getGuaranteeLimit(Long letterId, EntityManager manager) throws NamingException {
+	@Override
+	public String getGuaranteeLimit(Long letterId, EntityManager manager) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("select cg.id as id,cg.numberdoc as number, to_char(cg.issueDate,'dd.MM.yyyy') as issueDate")
 				.append(",cg.limitMoney, case when cg.isnolimit ='1' then true else false end as f6_noLimit")
@@ -963,12 +964,17 @@ public class ContractServiceBean implements IContractService {
 	 * @param patientId - Ид пациента
 	 * @param typeService  - тип услуги (операция, назначение)
 	 * */
+	@Override
 	public void addMedServiceAccount(String typeService, Long idService, String medServiceCode, Long patientId, Long letterId) {
 		addMedServiceAccount(typeService, idService, medServiceCode, patientId, theManager.find(ContractGuarantee.class,letterId));
 	}
+
+	@Override
 	public void addMedServiceAccount(String typeService, Long idService, String medServiceCode, Long patientId, ContractGuarantee letter) {
 		addMedServiceAccount(typeService, idService, medServiceCode, patientId, letter, null);
 	}
+
+	@Override
 	public void addMedServiceAccount(String typeService, Long idService, String medServiceCode, Long patientId, ContractGuarantee letter, EntityManager manager) {
 		if (manager == null) manager = theManager;
 		List<ContractAccountMedService> camsList = idService!=null ?  manager.createQuery("from ContractAccountMedService where typeService=:typeService and idService=:idService")

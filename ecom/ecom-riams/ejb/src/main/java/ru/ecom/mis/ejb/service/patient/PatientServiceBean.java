@@ -18,6 +18,8 @@ import ru.ecom.ejb.xml.XmlUtil;
 import ru.ecom.expomc.ejb.domain.omcvoc.OmcKodTer;
 import ru.ecom.expomc.ejb.domain.registry.RegInsuranceCompany;
 import ru.ecom.jaas.ejb.domain.SoftConfig;
+import ru.ecom.jaas.ejb.service.ISecUserService;
+import ru.ecom.jaas.ejb.service.ISoftConfigService;
 import ru.ecom.jaas.ejb.service.SoftConfigServiceBean;
 import ru.ecom.mis.ejb.domain.contract.NaturalPerson;
 import ru.ecom.mis.ejb.domain.licence.ExternalDocument;
@@ -108,7 +110,7 @@ public class PatientServiceBean implements IPatientService {
                 packetNumber = "0" + packetNumber;
             }
             SimpleDateFormat yyddmm = new SimpleDateFormat("yyMMdd");
-            String defaultLpuCode = SoftConfigServiceBean.getDefaultParameterByConfig("DEFAULT_LPU_OMCCODE", "123456", manager);
+            String defaultLpuCode = softConfigService.getDefaultParameterByConfig("DEFAULT_LPU_OMCCODE", "123456", manager);
             String filename = "DNM" + defaultLpuCode + "T30_" + yyddmm.format(dateTo) + "_" + packetNumber;
             String[] flds = {"N_ZAP", "FAM", "IM", "OT", "DR", "TEL", "IDCASE", "PROFIL", "DS", "D_BEG", "D_END", "END_RES", "YEAR"};
             String sql = "select pat.id as N_ZAP, pat.lastname as FAM ,pat.firstname AS IM ,pat.middlename AS OT ,to_char(pat.birthday,'yyyy-MM-dd') as DR  ,coalesce(pat.phone,'') as TEL ,d.id as IDCASE" +
@@ -1238,7 +1240,7 @@ public class PatientServiceBean implements IPatientService {
     public WebQueryResult findPatient(Long aLpuId, Long aLpuAreaId,
                                       String aLastname, String aYear, Boolean aNext, String aIdNext) {
         WebQueryResult wqr = new WebQueryResult();
-        String defaultLpu = SoftConfigServiceBean.getDefaultParameterByConfig("DEFAULT_LPU_OMCCODE", "-", manager);
+        String defaultLpu = softConfigService.getDefaultParameterByConfig("DEFAULT_LPU_OMCCODE", "-", manager);
         boolean isEnableLimitAreas = theSessionContext.isCallerInRole("/Policy/Mis/Patient/EnableLimitPsychAreas");
         String fiIdprev = null;
         if (aIdNext != null) {
@@ -1789,6 +1791,9 @@ public class PatientServiceBean implements IPatientService {
     ILocalEntityFormService entityFormService;
     private @EJB
     IWebQueryService webQueryService;
+
+    @EJB
+    private ISoftConfigService softConfigService;
     private @PersistenceContext
     EntityManager manager;
 

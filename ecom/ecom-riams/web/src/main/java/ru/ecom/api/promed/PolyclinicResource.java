@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 public class PolyclinicResource {
 
     private static final Logger LOG = Logger.getLogger(PolyclinicResource.class);
+
     @GET
     @Path("getPolyclinicCase")
     @Produces(MediaType.APPLICATION_JSON)
@@ -33,29 +34,30 @@ public class PolyclinicResource {
      * @param isUpload Boolean Если true, то не возвращать выгруженные
      * @return JSON in String
      */
-    public String getPolyclinicCase(@Context HttpServletRequest aRequest, @WebParam(name="token") String aToken
+    public String getPolyclinicCase(@Context HttpServletRequest aRequest, @WebParam(name = "token") String aToken
             , @QueryParam("dateTo") String dateTo, @QueryParam("sstream") String sstream
             , @QueryParam("isUpload") Boolean isUpload
             , @QueryParam("includeNeoUzi") Boolean includeNeoUzi
     ) throws NamingException {
-        if (aToken!=null) {ApiUtil.login(aToken,aRequest);}
-        ApiUtil.init(aRequest,aToken);
-        if (isUpload==null) isUpload=false;
-        IApiPolyclinicService service =Injection.find(aRequest).getService(IApiPolyclinicService.class);
+        if (aToken != null) {
+            ApiUtil.login(aToken, aRequest);
+        }
+        ApiUtil.init(aRequest, aToken);
+        if (isUpload == null) isUpload = false;
+        IApiPolyclinicService service = Injection.find(aRequest).getService(IApiPolyclinicService.class);
         SimpleDateFormat format;
         java.sql.Date d;
         try {
             format = new SimpleDateFormat("yyyy-MM-dd");
             d = new java.sql.Date(format.parse(dateTo).getTime());
-        }
-        catch(NullPointerException | ParseException ex) {
+        } catch (NullPointerException | ParseException ex) {
             JSONObject res = new JSONObject();
-            res.put("status","error")
-                    .put("reason","incorrect dateTo");
+            res.put("status", "error")
+                    .put("reason", "incorrect dateTo");
             return res.toString();
         }
-        if (sstream==null || sstream.equals("")) sstream="OBLIGATORYINSURANCE";
-        return service.getPolyclinicCase(d,sstream,isUpload, includeNeoUzi!=null && includeNeoUzi);
+        if (sstream == null || sstream.equals("")) sstream = "OBLIGATORYINSURANCE";
+        return service.getPolyclinicCase(d, sstream, isUpload, includeNeoUzi != null && includeNeoUzi);
     }
 
     @POST
@@ -70,13 +72,15 @@ public class PolyclinicResource {
      * @param tap_id String promed_id
      * @return JSON in String
      */
-    public String setEvnTap(@Context HttpServletRequest aRequest, @WebParam(name="token") String aToken
+    public String setEvnTap(@Context HttpServletRequest aRequest, @WebParam(name = "token") String aToken
             , @QueryParam("medcase_id") Long medcaseId, @QueryParam("tap_id") Long tapId
     ) throws NamingException {
-        if (aToken!=null) {ApiUtil.login(aToken,aRequest);}
-        ApiUtil.init(aRequest,aToken);
-        IApiPolyclinicService service =Injection.find(aRequest).getService(IApiPolyclinicService.class);
-        return service.setEvnTap(medcaseId,tapId);
+        if (aToken != null) {
+            ApiUtil.login(aToken, aRequest);
+        }
+        ApiUtil.init(aRequest, aToken);
+        IApiPolyclinicService service = Injection.find(aRequest).getService(IApiPolyclinicService.class);
+        return service.setEvnTap(medcaseId, tapId);
     }
 
     @GET
@@ -90,11 +94,13 @@ public class PolyclinicResource {
      * @param workfunction_id Long Рабочая функция
      * @return JSON in String
      */
-    public String getWfInfo(@Context HttpServletRequest aRequest, @WebParam(name="token") String aToken
-            , @QueryParam("workfunction_id") Long workfunction_id ) throws NamingException {
-        if (aToken!=null) {ApiUtil.login(aToken,aRequest);}
-        ApiUtil.init(aRequest,aToken);
-        IApiPolyclinicService service =Injection.find(aRequest).getService(IApiPolyclinicService.class);
+    public String getWfInfo(@Context HttpServletRequest aRequest, @WebParam(name = "token") String aToken
+            , @QueryParam("workfunction_id") Long workfunction_id) throws NamingException {
+        if (aToken != null) {
+            ApiUtil.login(aToken, aRequest);
+        }
+        ApiUtil.init(aRequest, aToken);
+        IApiPolyclinicService service = Injection.find(aRequest).getService(IApiPolyclinicService.class);
         return service.getWfInfo(workfunction_id);
     }
 
@@ -112,17 +118,19 @@ public class PolyclinicResource {
      * @param promedcode_workstaff String promedcode_workstaff
      * @return JSON in String
      */
-    public String setWfInfo(@Context HttpServletRequest aRequest, @Context HttpServletResponse aResponse,  String jsonData) throws NamingException {
+    public String setWfInfo(@Context HttpServletRequest aRequest, @Context HttpServletResponse aResponse, String jsonData) throws NamingException {
         aResponse.setHeader("Access-Control-Allow-Origin", "*");
         aResponse.setHeader("Access-Control-Allow-Methods", "POST");
         JSONObject req = new JSONObject(jsonData);
         String token = req.has("token") ? req.getString("token") : null;
-        if (token!=null) {ApiUtil.login(token,aRequest);}
-        ApiUtil.init(aRequest,token);
+        if (token != null) {
+            ApiUtil.login(token, aRequest);
+        }
+        ApiUtil.init(aRequest, token);
         Long workFunctionId = req.getLong("workfunctionId");
         Long promedcodeLpuSection = req.getLong("promedcodeLpuSection");
         Long promedcodeWorkstaff = req.getLong("promedcodeWorkstaff");
-        IApiPolyclinicService service =Injection.find(aRequest).getService(IApiPolyclinicService.class);
-        return service.setWfInfo(workFunctionId,promedcodeLpuSection,promedcodeWorkstaff);
+        IApiPolyclinicService service = Injection.find(aRequest).getService(IApiPolyclinicService.class);
+        return service.setWfInfo(workFunctionId, promedcodeLpuSection, promedcodeWorkstaff);
     }
 }
