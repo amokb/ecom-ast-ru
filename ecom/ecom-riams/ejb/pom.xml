@@ -200,19 +200,7 @@
 -->
 
         <plugins>
-            <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>6.0.7</version>
-                <configuration>
-                    <driver>org.postgresql.Driver</driver>
-                    <url>jdbc:postgresql://192.168.7.249:5432/riams</url>
-                    <serverId>test</serverId>
-                    <workingDirectory>db/migration</workingDirectory>
-                    <user>postgres</user>
-                    <password>mySecretPassword</password>
-                </configuration>
-            </plugin>
+<!--
             <plugin>
                 <groupId>com.pvsstudio</groupId>
                 <artifactId>pvsstudio-maven-plugin</artifactId>
@@ -223,15 +211,8 @@
                         <outputFile>pvs-output.txt</outputFile>
                     </analyzer>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-ear-plugin</artifactId>
-                <version>2.8</version>
-                <configuration>
+            </plugin>-->
 
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -266,11 +247,4 @@
         </plugins>
     </build>
 
-
-   <!-- <pluginRepositories>
-        <pluginRepository>
-            <id>pvsstudio-maven-repo</id>
-            <url>http://files.viva64.com/java/pvsstudio-maven-repository/</url>
-        </pluginRepository>
-    </pluginRepositories>-->
 </project>
