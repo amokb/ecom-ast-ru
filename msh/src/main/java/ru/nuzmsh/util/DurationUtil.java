@@ -1,4 +1,4 @@
-package ru.ecom.ejb.util;
+package ru.nuzmsh.util;
 
 import ru.nuzmsh.util.format.DateFormat;
 

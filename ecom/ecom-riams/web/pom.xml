@@ -8,27 +8,28 @@
         <build.plugins.plugin.version>1</build.plugins.plugin.version>
         <pvsstudio.version>7.06.37377</pvsstudio.version>
         <kotlin.version>1.3.61</kotlin.version>
+            <jdk.version>1.8</jdk.version>
+            <libdir>C:\Users\Енот\IdeaProjects\medos\MedOS_libs\</libdir>
     </properties>
-    <parent>
+   <!-- <parent>
         <groupId>ru.ecom</groupId>
         <artifactId>pom</artifactId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>../../../pom/pom.xml</relativePath>
-    </parent>
-
+    </parent>-->
     <groupId>ru.amokb</groupId>
     <artifactId>riams-web</artifactId>
     <version>2020</version>
     <packaging>war</packaging>
 
     <dependencies>
-        <dependency>
+       <!-- <dependency>
             <groupId>uk.ltd.getahead</groupId>
             <artifactId>dwr</artifactId>
             <version>3.0.2-RELEASE</version>
             <systemPath>${libdir}/dwr/dwr.jar</systemPath>
             <scope>system</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -68,13 +69,13 @@
             <scope>system</scope>
             <version>RELEASE</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>ru.ecom</groupId>
             <artifactId>gwt-document</artifactId>
             <systemPath>${libdir}/ecom/gwt/document/ecom-gwt-document.jar</systemPath>
             <scope>system</scope>
             <version>RELEASE</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>ru.ecom</groupId>
             <artifactId>gwt-clazz</artifactId>
@@ -96,30 +97,30 @@
             <scope>system</scope>
             <version>RELEASE</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>ru.ecom</groupId>
             <artifactId>report</artifactId>
             <systemPath>${libdir}/ecom/report/ecom-report.jar</systemPath>
             <scope>system</scope>
             <version>1</version>
-        </dependency>
+        </dependency>-->
 
-        <dependency>
+       <!-- <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.4</version>
-        </dependency>
-        <dependency>
+        </dependency>-->
+       <!-- <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <version>3.2.2</version>
-        </dependency>
-        <dependency>
+        </dependency>-->
+       <!-- <dependency>
             <groupId>commons-digester</groupId>
             <artifactId>commons-digester</artifactId>
             <version>1.8</version>
-        </dependency>
-        <dependency>
+        </dependency>-->
+        <!--<dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
             <version>0.2</version>
@@ -133,45 +134,45 @@
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.2</version>
-        </dependency>
-        <dependency>
+        </dependency>-->
+        <!--<dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
             <version>1.6</version>
-        </dependency>
-        <dependency>
+        </dependency>-->
+      <!--  <dependency>
             <groupId>dwr</groupId>
             <artifactId>dwr</artifactId>
             <version>1.1.3</version>
-        </dependency>
+        </dependency>-->
 
 
-        <dependency>
+        <!--<dependency>
             <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>aopalliance-repackaged</artifactId>
             <version>2.6.1</version>
-        </dependency>
+        </dependency>-->
         <!-- https://mvnrepository.com/artifact/org.objectweb.asm/org.objectweb.asm -->
-        <dependency>
+       <!-- <dependency>
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
             <version>3.0</version>
-        </dependency>
-        <dependency>
+        </dependency>-->
+        <!--<dependency>
             <groupId>ecs</groupId>
             <artifactId>ecs</artifactId>
             <version>1.4.2</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>
             <version>2.2</version>
         </dependency>
-        <dependency>
+       <!-- <dependency>
             <groupId>javax.el</groupId>
             <artifactId>el-api</artifactId>
             <version>1.0</version>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>ru.ecom</groupId>
@@ -184,12 +185,12 @@
             <version>RELEASE</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
+      <!--  <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
             <scope>compile</scope>
-        </dependency>
+        </dependency>-->
     </dependencies>
 
     <build>
@@ -232,7 +233,11 @@
                     <webXml>src/webapp/WEB-INF/web.xml</webXml>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.2</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

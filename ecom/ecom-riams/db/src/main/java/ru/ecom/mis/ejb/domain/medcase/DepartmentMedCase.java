@@ -3,7 +3,7 @@ package ru.ecom.mis.ejb.domain.medcase;
 
 import ru.ecom.ejb.services.index.annotation.AIndex;
 import ru.ecom.ejb.services.index.annotation.AIndexes;
-import ru.ecom.ejb.util.DurationUtil;
+import ru.nuzmsh.util.DurationUtil;
 import ru.ecom.expomc.ejb.domain.omcvoc.OmcStandart;
 import ru.ecom.mis.ejb.domain.lpu.BedFund;
 import ru.ecom.mis.ejb.domain.lpu.HospitalBed;
