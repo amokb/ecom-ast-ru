@@ -9,7 +9,6 @@
         <dirname>ecom/riams</dirname>
         <pvsstudio.version>7.06.37377</pvsstudio.version>
         <jdk.version>1.8</jdk.version>
-        <libdir>C:\Users\Енот\IdeaProjects\medos\MedOS_libs\</libdir>
     </properties>
     <groupId>ru.ecom</groupId>
     <artifactId>riams-ejb</artifactId>
@@ -18,6 +17,21 @@
     <name>riams-ejb</name>
 
     <dependencies>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20180813</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.ecom</groupId>
+            <artifactId>ecom-report</artifactId>
+            <version>2020</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>1.0.2</version>
+        </dependency>
         <dependency>
             <groupId>ru.ecom</groupId>
             <artifactId>riams-db</artifactId>

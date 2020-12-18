@@ -12,8 +12,7 @@ public class CheckTableDecorator implements ITableDecorator {
 
 	public String getRowCssClass(Object aRow) {
 		CheckForm form = (CheckForm) aRow ;
-		if(form.getDisabled()) return "disabled" ;
-		return "checkType"+form.getCheckType() ;
+		return form.getDisabled()? "disabled" : "checkType"+form.getCheckType() ;
 	}
 	
 

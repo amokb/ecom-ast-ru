@@ -29,11 +29,11 @@ public class PrintAction extends BaseAction {
 		String ispRepBase = aRequest.getParameter("isReportBase") ;
 		String servJs = aRequest.getParameter("s") ;
 		String methodJs = aRequest.getParameter("m") ;
-		if (ispRepBase!=null &&ispRepBase.toUpperCase().equals("TRUE") 
+		if (ispRepBase!=null && ispRepBase.equalsIgnoreCase("TRUE")
 	        		&& RolesHelper.checkRoles("/Policy/Config/IsReportBase",aRequest) 
-	        		&& servJs!=null && servJs.equals("PrintService")) {
+	        		&& "PrintService".equals(servJs)) {
 	        	appName = Injection.getWebName(aRequest, null) ;
-	        	appName = appName.substring(0,1)+"rep"+appName.substring(1) ;
+	        	appName = appName.charAt(0)+"rep"+appName.substring(1) ;
 	        } else {
 	        	appName = Injection.getWebName(aRequest, null) ;
 	        }
@@ -51,7 +51,7 @@ public class PrintAction extends BaseAction {
 		String print = "no" ;
 		boolean isTxtFile = false ;
 		
-		WebQueryResult printMain = null ;
+		WebQueryResult printMain ;
         if (!list.isEmpty()) {
         	printMain = list.iterator().next() ;
         } else {
@@ -60,7 +60,9 @@ public class PrintAction extends BaseAction {
             list = service1.executeNativeSql(sql.toString(),1);
             if (!list.isEmpty()) {
             	printMain = list.iterator().next() ;
-            }
+            } else {
+				printMain = null;
+			}
         }
 		if (printMain!=null) {
             sql = new StringBuilder() ;

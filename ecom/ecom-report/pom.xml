@@ -5,50 +5,29 @@
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <properties>
-        <appname>riams-db</appname>
+        <appname>ecom-report</appname>
         <dirname>ecom/riams</dirname>
         <pvsstudio.version>7.06.37377</pvsstudio.version>
         <jdk.version>1.8</jdk.version>
     </properties>
     <groupId>ru.ecom</groupId>
-    <artifactId>riams-db</artifactId>
+    <artifactId>ecom-report</artifactId>
     <version>2020</version>
     <packaging>jar</packaging>
-    <name>riams-db</name>
+    <name>ecom-report</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>codecs</artifactId>
-            <systemPath>${libdir}/apache-commons/commons-codec-1.10.jar</systemPath>
+            <groupId>bsh</groupId>
+            <artifactId>bsh</artifactId>
+            <systemPath>${libdir}/bsh/bsh-2.0b4.jar</systemPath>
             <scope>system</scope>
             <version>RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>ru.ecom</groupId>
-            <artifactId>jboss</artifactId>
-            <scope>system</scope>
-            <systemPath>${libdir}/ecom/jboss/ecom-jboss.jar</systemPath>
-            <version>RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-            <version>3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mozilla</groupId>
-            <artifactId>javascript</artifactId>
-            <systemPath>${libdir}/rhino/custom_rhino.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>client</artifactId>
-            <systemPath>${libdir}/jboss/jbossall-client.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.6</version>
         </dependency>
         <dependency>
             <groupId>com</groupId>
@@ -58,16 +37,9 @@
             <version>RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>bsh</groupId>
-            <artifactId>bsh</artifactId>
-            <systemPath>${libdir}/bsh/bsh-2.0b4.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>ejb3</artifactId>
-            <systemPath>${libdir}/jboss/jboss-ejb3.jar</systemPath>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <systemPath>${libdir}/jdom/jdom.jar</systemPath>
             <scope>system</scope>
             <version>RELEASE</version>
         </dependency>
@@ -78,99 +50,33 @@
             <scope>system</scope>
             <version>RELEASE</version>
         </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.jdom/jdom -->
-        <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom</artifactId>
-            <systemPath>${libdir}/jdom/jdom.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>ru.nuzmsh</groupId>
-            <artifactId>dbflib</artifactId>
-            <systemPath>${libdir}/msh/dbflib/dbflib-0.1.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>annotations</artifactId>
-            <systemPath>${libdir}/jboss/jboss-annotations-ejb3.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>annotations</artifactId>
-            <systemPath>${libdir}/hibernate/entitymanager/hibernate-annotations.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <systemPath>${libdir}/jboss/jboss-ejb3x.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.perststense</groupId>
-            <artifactId>codecs</artifactId>
-            <systemPath>${libdir}/hibernate/entitymanager/hibernate-entitymanager.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.entitymanager</groupId>
-            <artifactId>manager</artifactId>
-            <systemPath>${libdir}/hibernate/entitymanager/hibernate3.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
-        </dependency>
+
         <dependency>
             <groupId>ru.ecom</groupId>
             <artifactId>msh</artifactId>
             <version>2020</version>
         </dependency>
-        <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>4.0</version>  <!--4.1-->
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.2.8.jre7</version>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>ru.ecom</groupId>
-            <artifactId>ecom-report</artifactId>
-            <version>2020</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache</groupId>
-            <artifactId>struts</artifactId>
-            <systemPath>${libdir}/struts/struts.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20180813</version>
-        </dependency>
+        <!--      <dependency>
+                 <groupId>com.opencsv</groupId>
+                 <artifactId>opencsv</artifactId>
+                 <version>4.0</version>  &lt;!&ndash;4.1&ndash;&gt;
+             </dependency>
+             <dependency>
+                 <groupId>org.postgresql</groupId>
+                 <artifactId>postgresql</artifactId>
+                 <version>42.2.8.jre7</version>
+             </dependency>
+             <dependency>
+                 <groupId>log4j</groupId>
+                 <artifactId>log4j</artifactId>
+                 <version>1.2.17</version>
+             </dependency>
+             <dependency>
+                 <groupId>javax.persistence</groupId>
+                 <artifactId>persistence-api</artifactId>
+                 <version>1.0.2</version>
+             </dependency>-->
 
 
         <!--      <dependency>
@@ -179,7 +85,7 @@
                   <version>2.0.2</version>
               </dependency>-->
 
-        <dependency>
+      <!--  <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.8.5</version>
@@ -190,7 +96,7 @@
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.6.2</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>-->
     </dependencies>
 
     <build>

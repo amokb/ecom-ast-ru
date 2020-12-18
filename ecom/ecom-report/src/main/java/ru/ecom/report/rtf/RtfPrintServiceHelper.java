@@ -67,7 +67,7 @@ public class RtfPrintServiceHelper {
              driver.print(theReplaceHelper, valueGetter) ;
              driver.buildFile(getRemovedTempFile()) ;
 			 //Milamesher #120 24092018 вставка qr-кода
-			 try {
+			 /*try {
 			 	if (driver instanceof OdtPrintFileDriver) {
 					OdtPrintFileDriver d = (OdtPrintFileDriver)driver;
 					ru.ecom.report.QRCode.QRCodeServiceBean bean = new ru.ecom.report.QRCode.QRCodeServiceBean();
@@ -76,7 +76,7 @@ public class RtfPrintServiceHelper {
 			 }
 			 catch (Exception e) {
 			 	e.printStackTrace();
-			 }
+			 }*/
 		return driver.getResultFilename() ; //outFile.getName();
          } catch (Exception e) {
              throw new RtfPrintException("Ошибка печати: "+e.getMessage(),e) ;
