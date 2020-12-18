@@ -18,6 +18,20 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.tools</groupId>
+            <artifactId>ant</artifactId>
+            <systemPath>${libdir}/ant/ant.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache</groupId>
+            <artifactId>struts</artifactId>
+            <systemPath>${libdir}/struts/struts.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20180813</version>
