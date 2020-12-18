@@ -230,12 +230,12 @@
 
 
         <plugins>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.1.1</version>
 
-            </plugin>
+            </plugin>-->
             <!--            <plugin>
                              <groupId>com.pvsstudio</groupId>
                              <artifactId>pvsstudio-maven-plugin</artifactId>
@@ -263,7 +263,7 @@
                     <target>${jdk.version}</target>
                 </configuration>
             </plugin>
-            <plugin>
+         <!--   <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
@@ -274,7 +274,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.0</version>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 </project>

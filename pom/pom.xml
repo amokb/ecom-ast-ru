@@ -13,7 +13,6 @@
     <packaging>pom</packaging>
     <properties>
         <jdk.version>1.8</jdk.version>
-        <libdir>C:/Users/vtsybulin/IdeaProjects/MedOS_libs/</libdir>
     </properties>
 
     <dependencies>
