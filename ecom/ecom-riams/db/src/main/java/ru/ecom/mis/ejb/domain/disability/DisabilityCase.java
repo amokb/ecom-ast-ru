@@ -14,7 +14,7 @@ import javax.persistence.Transient;
 import ru.ecom.ejb.domain.simple.BaseEntity;
 import ru.ecom.ejb.services.index.annotation.AIndex;
 import ru.ecom.ejb.services.index.annotation.AIndexes;
-import ru.ecom.ejb.util.DurationUtil;
+import ru.nuzmsh.util.DurationUtil;
 import ru.ecom.mis.ejb.domain.medcase.MedCase;
 import ru.ecom.mis.ejb.domain.patient.Kinsman;
 import ru.ecom.mis.ejb.domain.patient.Patient;
@@ -28,7 +28,7 @@ import ru.nuzmsh.commons.formpersistence.annotation.Comment;
 @Comment("Случай нетрудоспособности")
 @Entity
 @AIndexes({
-	@AIndex(unique = false, properties= {"patient"})
+	@AIndex(properties= {"patient"})
 })
 @Table(schema="SQLUser")
 public class DisabilityCase extends BaseEntity{

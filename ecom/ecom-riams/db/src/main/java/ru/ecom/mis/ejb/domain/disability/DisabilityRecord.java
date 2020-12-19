@@ -3,7 +3,7 @@ package ru.ecom.mis.ejb.domain.disability;
 import ru.ecom.ejb.domain.simple.BaseEntity;
 import ru.ecom.ejb.services.index.annotation.AIndex;
 import ru.ecom.ejb.services.index.annotation.AIndexes;
-import ru.ecom.ejb.util.DurationUtil;
+import ru.nuzmsh.util.DurationUtil;
 import ru.ecom.mis.ejb.domain.disability.voc.VocDisabilityRegime;
 import ru.ecom.mis.ejb.domain.medcase.MedCase;
 import ru.ecom.mis.ejb.domain.worker.WorkFunction;
@@ -20,9 +20,9 @@ import java.sql.Time;
  */
 @Entity
 @AIndexes({
-		@AIndex(unique = false, properties= {"dateFrom"})
-		,@AIndex(unique = false, properties= {"dateTo"})
-		,@AIndex(unique = false, properties= {"disabilityDocument"})
+		@AIndex(properties= {"dateFrom"})
+		,@AIndex(properties= {"dateTo"})
+		,@AIndex(properties= {"disabilityDocument"})
 })
 @Table(schema="SQLUser")
 public class DisabilityRecord extends BaseEntity{

@@ -1,7 +1,7 @@
-package test.ru.ecom.ejb.util;
+package ru.nuzmsh.util.format;
 
 import org.junit.jupiter.api.Test;
-import ru.ecom.ejb.util.DurationUtil;
+import ru.nuzmsh.util.DurationUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

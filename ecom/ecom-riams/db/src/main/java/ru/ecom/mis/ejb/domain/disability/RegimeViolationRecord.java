@@ -3,7 +3,7 @@ package ru.ecom.mis.ejb.domain.disability;
 import ru.ecom.ejb.domain.simple.BaseEntity;
 import ru.ecom.ejb.services.index.annotation.AIndex;
 import ru.ecom.ejb.services.index.annotation.AIndexes;
-import ru.ecom.ejb.util.DurationUtil;
+import ru.nuzmsh.util.DurationUtil;
 import ru.ecom.mis.ejb.domain.disability.voc.VocRegimeViolationType;
 import ru.nuzmsh.commons.formpersistence.annotation.Comment;
 
@@ -16,7 +16,7 @@ import java.sql.Date;
  */
 @Entity
 @AIndexes({
-	@AIndex(unique = false, properties= {"disabilityDocument"})
+	@AIndex(properties= {"disabilityDocument"})
 })
 @Table(schema="SQLUser")
 public class RegimeViolationRecord extends BaseEntity {
@@ -58,9 +58,8 @@ public class RegimeViolationRecord extends BaseEntity {
 	@Comment("Информация о нарушении режима")
 	@Transient
 	public String getInfo() {
-		String ret = getRegimeViolationTypeInfo() + " " +
+		return getRegimeViolationTypeInfo() + " " +
 				DurationUtil.getDuration(getDateFrom(), getDateTo());
-		return ret;
 	}
 
 	/** Документ нетрудоспособности */
