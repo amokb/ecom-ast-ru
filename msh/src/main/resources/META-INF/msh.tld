@@ -1,0 +1,2444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd"
+    version="2.0">
+
+   <tlib-version>1.0</tlib-version>
+   <short-name>msh</short-name>
+
+   <uri>http://www.nuzmsh.ru/tags/msh</uri>
+
+   <tag>
+
+      <description>Колонки для TreeTable</description>
+      <display-name>Колонки для TreeTable</display-name>
+      <icon>    
+      </icon>
+      <name>treeTableCols</name>
+      <tag-class>ru.nuzmsh.web.tree.TreeTableColsTag</tag-class>
+      <body-content>scriptless</body-content>
+
+   </tag>
+   <tag>
+
+      <description>hideException</description>
+      <display-name>hideException</display-name>
+      <icon>    
+      </icon>
+      <name>hideException</name>
+      <tag-class>ru.nuzmsh.web.tags.HideExceptionTag</tag-class>
+      <body-content>scriptless</body-content>
+
+   </tag>
+   <tag>
+
+      <description>Есть ли такие роли</description>
+      <display-name>Есть ли такие роли</display-name>
+      <icon>    
+      </icon>
+      <name>ifInRole</name>
+      <tag-class>ru.nuzmsh.web.tags.IfInRoleTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Есть ли такие роли</description>
+         <name>roles</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Setting default forucs</description>
+      <display-name>Setting default forucs</display-name>
+      <icon>    
+      </icon>
+      <name>setDefaultFocus</name>
+      <tag-class>ru.nuzmsh.web.tags.SetDefaultFocusTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Setting default forucs</description>
+         <name>id</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Содержимое секции</description>
+      <display-name>Содержимое секции</display-name>
+      <icon>    
+      </icon>
+      <name>sectionContent</name>
+      <tag-class>ru.nuzmsh.web.tags.SectionContentTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Panel</description>
+      <display-name>Panel</display-name>
+      <icon>    
+      </icon>
+      <name>panel</name>
+      <tag-class>ru.nuzmsh.web.tags.PanelTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Panel</description>
+         <name>title</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Panel</description>
+         <name>colsWidth</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Panel</description>
+         <name>styleId</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Panel</description>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Table Textfield JSP tag.</description>
+      <display-name>TableTextfield</display-name>
+      <icon>    
+      </icon>
+      <name>tableTextfield</name>
+      <tag-class>ru.nuzmsh.web.tags.TableTextfieldTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Table Textfield JSP tag.</description>
+         <name>cssClass</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Textfield JSP tag.</description>
+         <name>textfieldName</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Textfield JSP tag.</description>
+         <name>textfieldShortName</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Textfield JSP tag.</description>
+         <name>property</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Textfield JSP tag.</description>
+         <name>addParam</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Textfield JSP tag.</description>
+         <name>textfieldFunction</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Textfield JSP tag.</description>
+         <name>role</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Textfield JSP tag.</description>
+         <name>hideIfEmpty</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Если форма для просмотра и редактирования</description>
+      <display-name>Если форма для просмотра и редактирования</display-name>
+      <icon>    
+      </icon>
+      <name>ifFormTypeAreViewOrEdit</name>
+      <tag-class>ru.nuzmsh.web.tags.IfFormTypeAreViewOrEditTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Секция</description>
+         <name>formName</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Секция</description>
+         <name>insideJavascript</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Если форма только для создания</description>
+      <display-name>Если форма только для создания</display-name>
+      <icon>    
+      </icon>
+      <name>ifFormTypeIsCreate</name>
+      <tag-class>ru.nuzmsh.web.tags.IfFormTypeIsCreateTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Секция</description>
+         <name>formName</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Секция</description>
+         <name>insideJavascript</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Секция</description>
+      <display-name>Секция</display-name>
+      <icon>    
+      </icon>
+      <name>section</name>
+      <tag-class>ru.nuzmsh.web.tags.SectionTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Секция</description>
+         <name>title</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Секция</description>
+         <name>createUrl</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Секция</description>
+         <name>shortList</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Секция</description>
+         <name>listUrl</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Секция</description>
+         <name>createRoles</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Секция</description>
+         <name>viewRoles</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Table Button JSP tag.</description>
+      <display-name>TableButton</display-name>
+      <icon>    
+      </icon>
+      <name>tableButton</name>
+      <tag-class>ru.nuzmsh.web.tags.TableButtonTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Table Button JSP tag.</description>
+         <name>cssClass</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Button JSP tag.</description>
+         <name>buttonName</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Button JSP tag.</description>
+         <name>buttonShortName</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Button JSP tag.</description>
+         <name>property</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Button JSP tag.</description>
+         <name>addParam</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Button JSP tag.</description>
+         <name>buttonFunction</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Button JSP tag.</description>
+         <name>role</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Button JSP tag.</description>
+         <name>hideIfEmpty</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Секция</description>
+      <display-name>Выводить блок, если поле формы - истина, либо не пустое</display-name>
+      <icon>    
+      </icon>
+      <name>ifPropertyIsTrue</name>
+      <tag-class>ru.nuzmsh.web.tags.IfPropertyIsTrueTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Секция</description>
+         <name>propertyName</name>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Секция</description>
+         <name>formName</name>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Секция</description>
+         <name>invert</name>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Table JSP tag.</description>
+      <display-name>Table</display-name>
+      <icon>    
+      </icon>
+      <name>table</name>
+      <tag-class>ru.nuzmsh.web.tags.TableTag</tag-class>
+      <body-content>JSP</body-content>
+
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>hideTitle</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>cellFunction</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>disableKeySupport</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>selection</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>viewUrl</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>printUrl</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>deleteUrl</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>idField</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>decorator</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>styleRow</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>name</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>navigationAction</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>action</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>noDataMessage</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>editUrl</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>disabledGoFirst</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>disabledGoLast</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>printToExcelButton</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>openNewWindow</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>escapeSymbols</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table JSP tag.</description>
+         <name>sortable</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Выводит содержимое, если есть данные в таблице. Использовать толко внутри msh:table</description>
+      <display-name>Выводит содержимое, если есть данные в таблице</display-name>
+      <icon>    
+      </icon>
+      <name>tableNotEmpty</name>
+      <tag-class>ru.nuzmsh.web.tags.TableNotEmptyTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Выводит содержимое, если есть данные в таблице. Использовать толко внутри msh:table</description>
+         <name>name</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Печать информационного сообщения</description>
+      <display-name>Печать информационного сообщения</display-name>
+      <icon>    
+      </icon>
+      <name>infoMessage</name>
+      <tag-class>ru.nuzmsh.web.tags.InfoMessageTag</tag-class>
+      <body-content>scriptless</body-content>
+
+   </tag>
+   <tag>
+
+      <description>В режиме IDE?</description>
+      <display-name>В режиме IDE?</display-name>
+      <icon>    
+      </icon>
+      <name>ifInIdeMode</name>
+      <tag-class>ru.nuzmsh.web.tags.IfInIdeModeTag</tag-class>
+      <body-content>scriptless</body-content>
+
+   </tag>
+   <tag>
+
+      <description>Text Field JSP tag.</description>
+      <display-name>Text Field</display-name>
+      <icon>    
+      </icon>
+      <name>textField</name>
+      <tag-class>ru.nuzmsh.web.tags.TextFieldTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Text Field JSP tag.</description>
+         <name>passwordEnabled</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>hideLabel</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>property</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>viewOnlyField</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>size</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>label</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>labelColSpan</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>fieldColSpan</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>horizontalFill</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>submitCancelButtonsRow</description>
+      <display-name>submitCancelButtonsRow</display-name>
+      <icon>    
+      </icon>
+      <name>submitCancelButtonsRow</name>
+      <tag-class>ru.nuzmsh.web.tags.SubmitCancelButtonsRowTag</tag-class>
+      <body-content>JSP</body-content>
+
+      <attribute>
+         <description>submitCancelButtonsRow</description>
+         <name>functionSubmit</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>submitCancelButtonsRow</description>
+         <name>colSpan</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>submitCancelButtonsRow</description>
+         <name>notDisplayCancel</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>submitCancelButtonsRow</description>
+         <name>labelCreate</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>submitCancelButtonsRow</description>
+         <name>labelCreating</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>submitCancelButtonsRow</description>
+         <name>labelSave</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>submitCancelButtonsRow</description>
+         <name>labelSaving</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>submitCancelButtonsRow</description>
+         <name>doNotDisableButtons</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>submitCancelButtonsRow</description>
+         <name>submitLabel</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>submitCancelButtonsRow</description>
+         <name>submitLabelAttribute</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>IDE MODE</description>
+      <display-name>IDE MODE</display-name>
+      <icon>    
+      </icon>
+      <name>ideMode</name>
+      <tag-class>ru.nuzmsh.web.tags.IdeModeTag</tag-class>
+      <body-content>empty</body-content>
+
+   </tag>
+   <tag>
+
+      <description>Название страницы</description>
+      <display-name>Title</display-name>
+      <icon>    
+      </icon>
+      <name>title</name>
+      <tag-class>ru.nuzmsh.web.tags.TitleTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Название страницы</description>
+         <name>title</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Название страницы</description>
+         <name>mainMenu</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Название страницы</description>
+         <name>property</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Кнопка отмены</description>
+      <display-name>Кнопка отмены</display-name>
+      <icon>    
+      </icon>
+      <name>buttonCancel</name>
+      <tag-class>ru.nuzmsh.web.tags.ButtonCancelTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Кнопка отмены</description>
+         <name>label</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Table Column JSP tag.</description>
+      <display-name>TableColumn</display-name>
+      <icon>    
+      </icon>
+      <name>tableColumn</name>
+      <tag-class>ru.nuzmsh.web.tags.TableColumnTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Table Column JSP tag.</description>
+         <name>cssClass</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Column JSP tag.</description>
+         <name>columnName</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Column JSP tag.</description>
+         <name>identificator</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Column JSP tag.</description>
+         <name>property</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Column JSP tag.</description>
+         <name>isCalcAmount</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Column JSP tag.</description>
+         <name>addParam</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Column JSP tag.</description>
+         <name>role</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Column JSP tag.</description>
+         <name>width</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Table Column JSP tag.</description>
+         <name>hidden</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Если нет такой роли</description>
+      <display-name>Если нет такой роли</display-name>
+      <icon>    
+      </icon>
+      <name>ifNotInRole</name>
+      <tag-class>ru.nuzmsh.web.tags.IfNotInRoleTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Если нет такой роли</description>
+         <name>roles</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Form</description>
+      <display-name>Form</display-name>
+      <icon>    
+      </icon>
+      <name>form</name>
+      <tag-class>ru.nuzmsh.web.tags.FormTag</tag-class>
+      <body-content>JSP</body-content>
+
+      <attribute>
+         <description>Form</description>
+         <name>title</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Form</description>
+         <name>disableFormDataConfirm</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Form</description>
+         <name>method</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Form</description>
+         <name>fileTransferSupports</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Form</description>
+         <name>editRoles</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Form</description>
+         <name>createRoles</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Form</description>
+         <name>action</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Form</description>
+         <name>defaultField</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Form</description>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>JavaScript Src</description>
+      <display-name>JavaScript Src</display-name>
+      <icon>    
+      </icon>
+      <name>javascriptSrc</name>
+      <tag-class>ru.nuzmsh.web.tags.JavaScriptSrcTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>JavaScript Src</description>
+         <name>src</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Меню для боковой панели</description>
+      <display-name>Side menu</display-name>
+      <icon>    
+      </icon>
+      <name>sideMenu</name>
+      <tag-class>ru.nuzmsh.web.tags.SideMenuTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Меню для боковой панели</description>
+         <name>title</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Вывод всех JavaScript</description>
+      <display-name>Вывод всех JavaScript</display-name>
+      <icon>    
+      </icon>
+      <name>javascriptContextWrite</name>
+      <tag-class>ru.nuzmsh.web.tags.JavaScriptContextWriteTag</tag-class>
+      <body-content>scriptless</body-content>
+
+   </tag>
+   <tag>
+
+      <description>Label JSP tag.</description>
+      <display-name>label</display-name>
+      <icon>    
+      </icon>
+      <name>label</name>
+      <tag-class>ru.nuzmsh.web.tags.LabelTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Label JSP tag.</description>
+         <name>fromRequestScope</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>hideLabel</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>property</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>viewOnlyField</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>size</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>label</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>labelColSpan</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>fieldColSpan</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>horizontalFill</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Side Link</description>
+      <display-name>sideLink</display-name>
+      <icon>    
+      </icon>
+      <name>sideLink</name>
+      <tag-class>ru.nuzmsh.web.tags.SideLinkTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Side Link</description>
+         <name>roles</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Side Link</description>
+         <name>styleId</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Side Link</description>
+         <name>key</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Side Link</description>
+         <name>params</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Side Link</description>
+         <name>isReport</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Side Link</description>
+         <name>action</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Side Link</description>
+         <name>name</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Side Link</description>
+         <name>title</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Side Link</description>
+         <name>confirm</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Переход в режим редактирования формы</description>
+      <display-name>Переход в режим редактирования формы</display-name>
+      <icon>    
+      </icon>
+      <name>customizeFormModeLink</name>
+      <tag-class>ru.nuzmsh.web.tags.CustomizeFormModeLinkTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Переход в режим редактирования формы</description>
+         <name>roles</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Не в режиме IDE?</description>
+      <display-name>Не в режиме IDE?</display-name>
+      <icon>    
+      </icon>
+      <name>ifNotInIdeMode</name>
+      <tag-class>ru.nuzmsh.web.tags.IfNotInIdeModeTag</tag-class>
+      <body-content>scriptless</body-content>
+
+   </tag>
+   <tag>
+
+      <description>Секция</description>
+      <display-name>Если форма только для просмотра</display-name>
+      <icon>    
+      </icon>
+      <name>ifFormTypeIsView</name>
+      <tag-class>ru.nuzmsh.web.tags.IfFormTypeIsViewTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Секция</description>
+         <name>formName</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Секция</description>
+         <name>insideJavascript</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Заголовок секции</description>
+      <display-name>Заголовок секции</display-name>
+      <icon>    
+      </icon>
+      <name>sectionTitle</name>
+      <tag-class>ru.nuzmsh.web.tags.SectionTitleTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Row</description>
+      <display-name>row</display-name>
+      <icon>    
+      </icon>
+      <name>row</name>
+      <tag-class>ru.nuzmsh.web.tags.RowTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Row</description>
+         <name>styleId</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Если форма только не для просмотра</description>
+      <display-name>Если форма только не для просмотра</display-name>
+      <icon>    
+      </icon>
+      <name>ifFormTypeIsNotView</name>
+      <tag-class>ru.nuzmsh.web.tags.IfFormTypeIsNotViewTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Секция</description>
+         <name>formName</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Секция</description>
+         <name>insideJavascript</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Text Area JSP tag.</description>
+      <display-name>Text Area</display-name>
+      <icon>    
+      </icon>
+      <name>textArea</name>
+      <tag-class>ru.nuzmsh.web.tags.TextAreaTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Text Area JSP tag.</description>
+         <name>rows</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Text Area JSP tag.</description>
+         <name>syntaxLanguage</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Text Area JSP tag.</description>
+         <name>isNotGoEnter</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>hideLabel</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>property</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>viewOnlyField</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>size</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>label</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>labelColSpan</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>fieldColSpan</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>horizontalFill</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>stylesheet</description>
+      <display-name>stylesheet</display-name>
+      <icon>    
+      </icon>
+      <name>stylesheet</name>
+      <tag-class>ru.nuzmsh.web.tags.StylesheetTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>stylesheet</description>
+         <name>src</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Вывод свойства</description>
+      <display-name>Вывод свойства</display-name>
+      <icon>    
+      </icon>
+      <name>propertyItem</name>
+      <tag-class>ru.nuzmsh.web.tags.PropertyItemTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Вывод свойства</description>
+         <name>property</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Вывод свойства</description>
+         <name>name</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>separator</description>
+      <display-name>Separator</display-name>
+      <icon>    
+      </icon>
+      <name>separator</name>
+      <tag-class>ru.nuzmsh.web.tags.SeparatorTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>separator</description>
+         <name>colSpan</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>separator</description>
+         <name>label</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Комментарий для форм</description>
+      <display-name>Комментарий для форм</display-name>
+      <icon>    
+      </icon>
+      <name>commentBox</name>
+      <tag-class>ru.nuzmsh.web.tags.CommentBoxTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Комментарий для форм</description>
+         <name>text</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Комментарий для форм</description>
+         <name>colSpanBefore</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Комментарий для форм</description>
+         <name>colSpan</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>A href element</description>
+      <display-name>A href element</display-name>
+      <icon>    
+      </icon>
+      <name>link</name>
+      <tag-class>ru.nuzmsh.web.tags.LinkTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>A href element</description>
+         <name>requestFocus</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>A href element</description>
+         <name>onclick</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>A href element</description>
+         <name>isReport</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>A href element</description>
+         <name>action</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>A href element</description>
+         <name>roles</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>A href element</description>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>checkBox</description>
+      <display-name>checkBox</display-name>
+      <icon>    
+      </icon>
+      <name>checkBox</name>
+      <tag-class>ru.nuzmsh.web.tags.CheckBoxTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>hideLabel</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>property</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>viewOnlyField</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>size</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>label</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>labelColSpan</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>fieldColSpan</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>horizontalFill</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Печать пользовательских сообщений</description>
+      <display-name>Печать пользовательских сообщений</display-name>
+      <icon>    
+      </icon>
+      <name>userMessage</name>
+      <tag-class>ru.nuzmsh.web.tags.UserMessageTag</tag-class>
+      <body-content>scriptless</body-content>
+
+   </tag>
+   <tag>
+
+      <description>Колонка для TreeTable</description>
+      <display-name>Колонка для TreeTable</display-name>
+      <icon>    
+      </icon>
+      <name>treeTableColumn</name>
+      <tag-class>ru.nuzmsh.web.tree.TreeTableColumnTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Колонка для TreeTable</description>
+         <name>title</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Колонка для TreeTable</description>
+         <name>property</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Autocomplete field JSP tag.</description>
+      <display-name>Auto complete Field</display-name>
+      <icon>    
+      </icon>
+      <name>autoComplete</name>
+      <tag-class>ru.nuzmsh.web.tags.AutoCompleteTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Autocomplete field JSP tag.</description>
+         <name>showId</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Autocomplete field JSP tag.</description>
+         <name>parentId</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Autocomplete field JSP tag.</description>
+         <name>parentAutocomplete</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Autocomplete field JSP tag.</description>
+         <name>viewAction</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Autocomplete field JSP tag.</description>
+         <name>shortViewAction</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Autocomplete field JSP tag.</description>
+         <name>vocName</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>hideLabel</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>property</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>viewOnlyField</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>size</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>label</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>labelColSpan</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>fieldColSpan</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>horizontalFill</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Hidden</description>
+      <display-name>Hidden</display-name>
+      <icon>    
+      </icon>
+      <name>hidden</name>
+      <tag-class>ru.nuzmsh.web.tags.HiddenTag</tag-class>
+      <body-content>JSP</body-content>
+
+      <attribute>
+         <description>Hidden</description>
+         <name>property</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Hidden</description>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Toolbar Element</description>
+      <display-name>Toolbar Element</display-name>
+      <icon>    
+      </icon>
+      <name>toolbar</name>
+      <tag-class>ru.nuzmsh.web.tags.ToolbarTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Toolbar Element</description>
+         <name>roles</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Выводит содержимое, если нет данных в таблице</description>
+      <display-name>Выводит содержимое, если нет данных в таблице</display-name>
+      <icon>    
+      </icon>
+      <name>tableEmpty</name>
+      <tag-class>ru.nuzmsh.web.tags.TableEmptyTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Выводит содержимое, если есть данные в таблице. Использовать толко внутри msh:table</description>
+         <name>name</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>ComboBox field JSP tag.</description>
+      <display-name>Combo box Field</display-name>
+      <icon>    
+      </icon>
+      <name>comboBox</name>
+      <tag-class>ru.nuzmsh.web.tags.ComboBoxTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Autocomplete field JSP tag.</description>
+         <name>showId</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Autocomplete field JSP tag.</description>
+         <name>parentId</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Autocomplete field JSP tag.</description>
+         <name>parentAutocomplete</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Autocomplete field JSP tag.</description>
+         <name>viewAction</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Autocomplete field JSP tag.</description>
+         <name>shortViewAction</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Autocomplete field JSP tag.</description>
+         <name>vocName</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>hideLabel</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>property</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>viewOnlyField</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>size</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>label</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>guid</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>labelColSpan</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>fieldColSpan</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Field JSP tag.</description>
+         <name>horizontalFill</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Вывод всех JavaScript</description>
+      <display-name>Вывод всех JavaScript</display-name>
+      <icon>    
+      </icon>
+      <name>javascriptContextLastWrite</name>
+      <tag-class>ru.nuzmsh.web.tags.JavaScriptContextLastWriteTag</tag-class>
+      <body-content>scriptless</body-content>
+
+   </tag>
+   <tag>
+
+      <description>Печать сообщения об ошибке</description>
+      <display-name>Печать сообщения об ошибке</display-name>
+      <icon>    
+      </icon>
+      <name>errorMessage</name>
+      <tag-class>ru.nuzmsh.web.tags.ErrorMessageTag</tag-class>
+      <body-content>scriptless</body-content>
+
+   </tag>
+   <tag>
+
+      <description>Дерево + таблица</description>
+      <display-name>Дерево + таблица</display-name>
+      <icon>    
+      </icon>
+      <name>treeTable</name>
+      <tag-class>ru.nuzmsh.web.tree.TreeTableTag</tag-class>
+      <body-content>scriptless</body-content>
+
+      <attribute>
+         <description>Дерево + таблица</description>
+         <name>input</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Дерево + таблица</description>
+         <name>nameField</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Дерево + таблица</description>
+         <name>title</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Дерево + таблица</description>
+         <name>installTo</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Дерево + таблица</description>
+         <name>idField</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Дерево + таблица</description>
+         <name>parentIdField</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Дерево + таблица</description>
+         <name>treeModel</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Печать заголовков http</description>
+      <display-name>Печать заголовков http</display-name>
+      <icon>    
+      </icon>
+      <name>requestHeadersTable</name>
+      <tag-class>ru.nuzmsh.web.tags.RequestHeadersTableTag</tag-class>
+      <body-content>scriptless</body-content>
+
+   </tag>
+
+</taglib>
