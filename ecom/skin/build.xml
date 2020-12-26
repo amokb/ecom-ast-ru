@@ -3,7 +3,7 @@
 
 	<!-- <property file="${user.home}/build.properties"/> -->
 	<import file="../ant-support/property-skeleton.xml" />
-	<target name='all' depends="prepare, shrink">
+	<target name='all' depends="prepare, shrink, make_war">
 		
 	</target>
 	<target name="prepare">
@@ -12,8 +12,6 @@
 	</target>
 	
   <target name="shrink" description="Уменьшение количества файлов и размера JS">
-
-  		
   	<concat fixlastline="true" destfile="skin/ac.js">
 		<fileset file='skin/js/jquery/jquery-3.2.1.min.js' />
 		<fileset file='skin/js/jquery/jquery-ui.min.js' />
@@ -54,4 +52,13 @@
 
 	</concat>
   </target>
+	<target name="make_war">
+		<delete file="./target/skin.war"/>
+
+		<jar destfile="./target/skin.war" compress="true" update="true"> <!-- создаем war сразу при билде. Для докера-->
+			<fileset dir='target/skin'>
+				<exclude name="test/"/>
+			</fileset>
+		</jar>
+	</target>
 </project>
