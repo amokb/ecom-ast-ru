@@ -1,20 +1,20 @@
 package ru.ecom.report.QRCode;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.qrcode.QRCodeWriter;
-import org.odftoolkit.simple.Document;
-import org.odftoolkit.simple.SpreadsheetDocument;
-import org.odftoolkit.simple.TextDocument;
-import org.odftoolkit.simple.common.navigation.TextNavigation;
-import org.odftoolkit.simple.common.navigation.TextSelection;
-import org.odftoolkit.simple.table.Cell;
-import org.odftoolkit.simple.table.Table;
+//import com.google.zxing.BarcodeFormat;
+//import com.google.zxing.client.j2se.MatrixToImageWriter;
+//import com.google.zxing.qrcode.QRCodeWriter;
+//import org.odftoolkit.simple.Document;
+//import org.odftoolkit.simple.SpreadsheetDocument;
+//import org.odftoolkit.simple.TextDocument;
+//import org.odftoolkit.simple.common.navigation.TextNavigation;
+//import org.odftoolkit.simple.common.navigation.TextSelection;
+//import org.odftoolkit.simple.table.Cell;
+//import org.odftoolkit.simple.table.Table;
 import sun.misc.BASE64Encoder;
 
-import javax.ejb.Local;
-import javax.ejb.Remote;
-import javax.ejb.Stateless;
+//import javax.ejb.Local;
+//import javax.ejb.Remote;
+//import javax.ejb.Stateless;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -27,9 +27,9 @@ import java.net.URI;
  * Created by Milamesher on 21.09.2018.
  * Для работы с QR-кодами.
  */
-@Stateless
-@Local(IQRCodeService.class)
-@Remote(IQRCodeService.class)
+//@Stateless
+//@Local(IQRCodeService.class)
+//@Remote(IQRCodeService.class)
 public class QRCodeServiceBean implements IQRCodeService {
     private String QR_CODE_filename="tmpFileForQRCode";
     //Метод возвращает qr-код с текстом, размерами QR_w и QR_h. default QR_TYPE PNG
@@ -37,13 +37,13 @@ public class QRCodeServiceBean implements IQRCodeService {
         if (QR_TYPE==null || QR_TYPE.equals("")) QR_TYPE="PNG";
         String QR_CODE_IMAGE_PATH = QR_CODE_filename+"."+QR_TYPE;
         String base64=null;
-        try {
+      /*  try {
             MatrixToImageWriter.writeToStream(new QRCodeWriter().encode(QR_text, BarcodeFormat.QR_CODE, QR_w, QR_h),QR_TYPE,new FileOutputStream(QR_CODE_IMAGE_PATH));
             base64 = encodeToString(ImageIO.read(new File(QR_CODE_IMAGE_PATH)), QR_TYPE);
         }
         catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
         return base64;
     }
     //Milamesher #120 14092018  метод получения строки в base64 из файла с изображением
@@ -60,7 +60,7 @@ public class QRCodeServiceBean implements IQRCodeService {
         return imageString;
     }
     //Milamesher #120 19092018 метод вставки qr-кода в файл
-    public Boolean createInsertQRCode(String QR_text,int QR_w, int QR_h, String QR_TYPE,String template,String ext,String replacesource) {
+    /*public Boolean createInsertQRCode(String QR_text,int QR_w, int QR_h, String QR_TYPE,String template,String ext,String replacesource) {
         Boolean flag = false;
         if (QR_text!=null && !QR_text.equals("") && QR_w!=0 && QR_h!=0 && template!=null && !template.equals("") && ext!=null && !ext.equals("")
                 && replacesource!=null && !replacesource.equals("")) {
@@ -79,9 +79,9 @@ public class QRCodeServiceBean implements IQRCodeService {
             }
         }
         return flag;
-    }
+    }*/
     //Milamesher #120 130092018  метод замены кодового слова на QR-код
-    private Boolean putQRImage(URI uri,String template, String replacesource) {
+    /*private Boolean putQRImage(URI uri,String template, String replacesource) {
         try {
             Document  textdoc=null;
             if (template.endsWith(".odt")) {
@@ -123,5 +123,5 @@ public class QRCodeServiceBean implements IQRCodeService {
             return false;
         }
         return true;
-    }
+    }*/
 }

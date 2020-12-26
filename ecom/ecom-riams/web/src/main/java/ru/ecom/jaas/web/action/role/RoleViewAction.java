@@ -18,14 +18,6 @@ public class RoleViewAction extends EditAction {
         super.myExecute(aMapping, aForm, aRequest, aResponse) ;
         SecRoleForm form = (SecRoleForm) aForm ;
         form.setTypeViewOnly();
-        /*
-
-        ISecRoleService service = (ISecRoleService) Injection.find(aRequest).getService("SecRoleService") ;
-        CheckNode root = service.loadPoliciesByRole(getLongId(aRequest, "Идентификатор роли")) ;
-        CheckNodesUtil.removeUnchecked(root);
-        aRequest.setAttribute("policies", root);
-        */
-
         return aMapping.findForward(SUCCESS) ;
     }
 }

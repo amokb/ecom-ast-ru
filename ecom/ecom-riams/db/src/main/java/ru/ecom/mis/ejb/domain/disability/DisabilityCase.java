@@ -28,7 +28,7 @@ import ru.nuzmsh.commons.formpersistence.annotation.Comment;
 @Comment("Случай нетрудоспособности")
 @Entity
 @AIndexes({
-	@AIndex(unique = false, properties= {"patient"})
+	@AIndex(properties= {"patient"})
 })
 @Table(schema="SQLUser")
 public class DisabilityCase extends BaseEntity{

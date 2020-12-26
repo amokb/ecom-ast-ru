@@ -74,7 +74,7 @@ public class PoiCellUtil {
         if (aStyle != null) {
             cell.setCellStyle(aStyle);
         }
-        cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+//        cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 
         if (aValue != null) {
             if (aValue instanceof Date) {

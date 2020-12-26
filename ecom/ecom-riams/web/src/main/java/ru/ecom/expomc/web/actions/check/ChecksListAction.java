@@ -13,13 +13,6 @@ public class ChecksListAction extends ListAction {
 
 	@Override
 	public ActionForward myExecute(ActionMapping aMapping, ActionForm aForm, HttpServletRequest aRequest, HttpServletResponse aResponse) throws Exception {
-		
-		ActionForward ret = super.myExecute(aMapping, aForm, aRequest, aResponse);
-		
-		
-		return ret ;
-		
+		return super.myExecute(aMapping, aForm, aRequest, aResponse);
 	}
-	
-
 }

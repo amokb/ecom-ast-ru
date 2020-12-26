@@ -16,7 +16,7 @@ import java.sql.Date;
  */
 @Entity
 @AIndexes({
-	@AIndex(unique = false, properties= {"disabilityDocument"})
+	@AIndex(properties= {"disabilityDocument"})
 })
 @Table(schema="SQLUser")
 public class RegimeViolationRecord extends BaseEntity {
@@ -58,9 +58,8 @@ public class RegimeViolationRecord extends BaseEntity {
 	@Comment("Информация о нарушении режима")
 	@Transient
 	public String getInfo() {
-		String ret = getRegimeViolationTypeInfo() + " " +
+		return getRegimeViolationTypeInfo() + " " +
 				DurationUtil.getDuration(getDateFrom(), getDateTo());
-		return ret;
 	}
 
 	/** Документ нетрудоспособности */

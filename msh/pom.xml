@@ -9,15 +9,20 @@
         <junit.jupiter.version>5.0.2</junit.jupiter.version>
         <junit-platform-runner.version>1.3.1</junit-platform-runner.version>
             <jdk.version>1.8</jdk.version>
-            <libdir>C:\Users\Енот\IdeaProjects\medos\MedOS_libs\</libdir>
     </properties>
-
     <groupId>ru.ecom</groupId>
     <artifactId>msh</artifactId>
     <version>2020</version>
     <packaging>jar</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>http</artifactId>
+            <systemPath>${libdir}/javax/javax.servlet.jsp.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet</artifactId>
@@ -48,11 +53,9 @@
             <version>RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>org.apache</groupId>
+            <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <systemPath>${libdir}/log4j/log4j.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
+            <version>1.2.17</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.jdom/jdom -->
@@ -71,6 +74,45 @@
             <version>RELEASE</version>
         </dependency>
         <dependency>
+            <groupId>taglibs</groupId>
+            <artifactId>standard</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+
+        <!-- JSTL -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ltd.getahead</groupId>
+            <artifactId>dwr</artifactId>
+            <version>3.0.2-RELEASE</version>
+            <systemPath>${libdir}/dwr/dwr.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.5</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>rs</artifactId>
+            <systemPath>${libdir}/jersey/javax.ws.rs-api-2.1.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-servlet</artifactId>
+            <systemPath>${libdir}/gwt/gwt-servlet.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.gwt</groupId>
             <artifactId>gwt-dev</artifactId>
             <systemPath>${libdir}/gwt/gwt-dev-linux.jar</systemPath>
@@ -78,12 +120,86 @@
             <version>RELEASE</version>
         </dependency>
         <dependency>
+            <groupId>org.apache</groupId>
+            <artifactId>axis</artifactId>
+            <systemPath>${libdir}/axis/axis.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.ecom</groupId>
+            <artifactId>gwt-idemode</artifactId>
+            <systemPath>${libdir}/ecom/gwt/idemode/ecom-gwt-idemode.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.ecom</groupId>
+            <artifactId>gwt-document</artifactId>
+            <systemPath>${libdir}/ecom/gwt/document/ecom-gwt-document.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.ecom</groupId>
+            <artifactId>gwt-clazz</artifactId>
+            <systemPath>${libdir}/ecom/gwt/clazz/ecom-gwt-clazz.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>websocket</artifactId>
+            <systemPath>${libdir}/javax/javax.websocket-api-1.1.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.media</groupId>
+            <artifactId>imageioimpl</artifactId>
+            <systemPath>${libdir}/image/jai_imageio.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.ecom</groupId>
+            <artifactId>report</artifactId>
+            <systemPath>${libdir}/ecom/report/ecom-report.jar</systemPath>
+            <scope>system</scope>
+            <version>1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>5.1.5.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-runner</artifactId>
+            <version>${junit-platform-runner.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.4.2</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>5.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.4.2</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
@@ -97,46 +213,16 @@
             </resource>
         </resources>
 
+
+
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.2</version>
-                <!-- <executions>
-                     <execution>
-                         <id>copy</id>
-                         <phase>package</phase>
-                         <goals>
-                             <goal>copy</goal>
-                         </goals>
-                     </execution>
-                 </executions>-->
-            </plugin>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.1.1</version>
 
-            </plugin>
-            <!--            <plugin>
-                             <groupId>com.pvsstudio</groupId>
-                             <artifactId>pvsstudio-maven-plugin</artifactId>
-                             <version>7.03.32667</version>
-                             <configuration>
-                                 <analyzer>
-                                     <outputType>text</outputType>
-                                     <outputFile>pvs-output.txt</outputFile>
-                                 </analyzer>
-                             </configuration>
-                             <executions>
-                                 <execution>
-                                     <phase>compile</phase>
-                                     <goals>
-                                         <goal>pvsAnalyze</goal>
-                                     </goals>
-                                 </execution>
-                             </executions>
-                         </plugin> -->
+            </plugin>-->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -145,17 +231,24 @@
                     <target>${jdk.version}</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <webXml>src/webapp/WEB-INF/web.xml</webXml>
-                </configuration>
-            </plugin>
+         <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.0</version>
+            </plugin>-->
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>4.5.3</version>
+                <executions>
+                    <execution>
+                        <id>antlr</id>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

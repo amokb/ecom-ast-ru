@@ -17,27 +17,30 @@ import java.util.List;
 
 
 /**
+ *
  */
 public class AddressServiceJs {
-    private static final Logger LOG = Logger.getLogger(AddressServiceJs.class) ;
+    private static final Logger LOG = Logger.getLogger(AddressServiceJs.class);
+
     public String getAddressRayon(Long aAddressId, String aHouse
-    		,HttpServletRequest aRequest) throws NamingException {
-    	IAddressService service = Injection.find(aRequest).getService(IAddressService.class);
-    	return service.getRayon(aAddressId, aHouse) ;
+            , HttpServletRequest aRequest) throws NamingException {
+        IAddressService service = Injection.find(aRequest).getService(IAddressService.class);
+        return service.getRayon(aAddressId, aHouse);
     }
+
     public String getAddressNonresidentString(Long aTerritory, String aRegion
-        	, Long aTypeSettlement
-        	, String aSettlement
-        	, Long aTypeStreet
-        	, String aStreet
-        	, String aHouseNumber
-        	, String aHouseBuilding, String aFlatNumber, String aZipCode, HttpServletRequest aRequest) throws NamingException {
-            IAddressService service = Injection.find(aRequest).getService(IAddressService.class);
-            return service.getAddressNonresidentString(aTerritory, aRegion, aTypeSettlement
-            		, aSettlement, aTypeStreet, aStreet, aHouseNumber, aHouseBuilding, aFlatNumber
-            		,aZipCode);
-            
-    	
+            , Long aTypeSettlement
+            , String aSettlement
+            , Long aTypeStreet
+            , String aStreet
+            , String aHouseNumber
+            , String aHouseBuilding, String aFlatNumber, String aZipCode, HttpServletRequest aRequest) throws NamingException {
+        IAddressService service = Injection.find(aRequest).getService(IAddressService.class);
+        return service.getAddressNonresidentString(aTerritory, aRegion, aTypeSettlement
+                , aSettlement, aTypeStreet, aStreet, aHouseNumber, aHouseBuilding, aFlatNumber
+                , aZipCode);
+
+
     }
 
 
@@ -47,10 +50,10 @@ public class AddressServiceJs {
         } else {
             try {
                 IAddressService service = Injection.find(aRequest).getService(IAddressService.class);
-                return service.getAddressString(Long.parseLong(aAddressId), aHouse, aCorpus, aFlat,aZipCode);
+                return service.getAddressString(Long.parseLong(aAddressId), aHouse, aCorpus, aFlat, aZipCode);
             } catch (Exception e) {
-                LOG.error(e.getMessage(),e);
-                throw new IllegalStateException(e) ;
+                LOG.error(e.getMessage(), e);
+                throw new IllegalStateException(e);
             }
         }
     }
@@ -59,64 +62,65 @@ public class AddressServiceJs {
         long level = Long.parseLong(aLevel);
         IAddressService service = Injection.find(aRequest).getService(IAddressService.class);
 
-        Long code = !StringUtil.isNullOrEmpty(aAddressId) ? Long.valueOf(aAddressId) : null;
+        Long code = StringUtil.isNotEmpty(aAddressId) ? Long.valueOf(aAddressId) : null;
 
         Long ret = service.getIdForLevel(level, code);
         return ret != null ? ret.toString() : "";
     }
 
     public String parseAddressPoints(long aLpuAreaId, Long aLpuAddressTextId, Long aAddress, String aPoints, HttpServletRequest aRequest) throws Exception {
-        if(aAddress==null || aAddress==0) throw new IllegalArgumentException("Не введен адрес") ;
+        if (aAddress == null || aAddress == 0) throw new IllegalArgumentException("Не введен адрес");
         try {
             AddressPointCheckHelper helper = new AddressPointCheckHelper();
             IAddressPointService service = Injection.find(aRequest).getService(IAddressPointService.class);
-            List<AddressPointCheck> list = helper.parsePoints(aPoints) ;
-            if(!list.isEmpty()) {
+            List<AddressPointCheck> list = helper.parsePoints(aPoints);
+            if (!list.isEmpty()) {
                 StringBuilder sb = new StringBuilder();
-                boolean firstAdded = false ;
+                boolean firstAdded = false;
                 for (AddressPointCheck point : list) {
                     service.checkExists(aLpuAreaId, aLpuAddressTextId, aAddress, point.getNumber(), point.getBuilding(), point.getFlat());
-                    if(!firstAdded) {
-                        firstAdded = true ;
+                    if (!firstAdded) {
+                        firstAdded = true;
                     } else {
-                        sb.append(", ") ;
+                        sb.append(", ");
                     }
-                    sb.append(point.getNumber()) ;
-                    if(point.getBuilding()!=null) {
-                        sb.append(" корпус ") ;
-                        sb.append(point.getBuilding()) ;
+                    sb.append(point.getNumber());
+                    if (point.getBuilding() != null) {
+                        sb.append(" корпус ");
+                        sb.append(point.getBuilding());
                     }
-                    if(point.getFlat()!=null) {
-                        sb.append(" кв. ") ;
-                        sb.append(point.getFlat()) ;
+                    if (point.getFlat() != null) {
+                        sb.append(" кв. ");
+                        sb.append(point.getFlat());
                     }
                 }
-                return sb.toString() ;
+                return sb.toString();
             } else {
                 service.checkExists(aLpuAreaId, aLpuAddressTextId, aAddress, null, null, null);
-                return "" ;
+                return "";
             }
-        } catch (EJBException ejbException ) {
-            if(ejbException.getCause()!=null) throw (Exception)ejbException.getCause();
+        } catch (EJBException ejbException) {
+            if (ejbException.getCause() != null) throw (Exception) ejbException.getCause();
             else throw ejbException;
         } catch (Exception e) {
-                throw e ;
+            throw e;
         }
     }
 
     public String findPatientLpu(Long aAddress, String aNumber, String aBuilding, String aBirthday, String aFlat, HttpServletRequest aRequest) throws Exception {
         try {
-        	java.util.Date utilDate = DateFormat.parseDate(aBirthday);
+            java.util.Date utilDate = DateFormat.parseDate(aBirthday);
             return Injection.find(aRequest).getService(IPatientService.class)
-            	.findPatientLpuInfo(aAddress, aNumber, aBuilding, new java.sql.Date(utilDate.getTime()), aFlat);
+                    .findPatientLpuInfo(aAddress, aNumber, aBuilding, new java.sql.Date(utilDate.getTime()), aFlat);
         } catch (Exception e) {
-            LOG.error("Ошибка "+e.getMessage(), e) ;
-            throw e ;
+            LOG.error("Ошибка " + e.getMessage(), e);
+            throw e;
         }
     }
+
     public String getZipcode(Long aAddress5, Long aAddress6, HttpServletRequest aRequest) throws Exception {
-    	IAddressService service = Injection.find(aRequest).getService(IAddressService.class);
-    	return service.getZipcode(aAddress5, aAddress6);
+        IAddressService service = Injection.find(aRequest).getService(IAddressService.class);
+        return service.getZipcode(aAddress5, aAddress6);
     }
 
 }

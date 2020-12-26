@@ -20,9 +20,9 @@ import java.sql.Time;
  */
 @Entity
 @AIndexes({
-		@AIndex(unique = false, properties= {"dateFrom"})
-		,@AIndex(unique = false, properties= {"dateTo"})
-		,@AIndex(unique = false, properties= {"disabilityDocument"})
+		@AIndex(properties= {"dateFrom"})
+		,@AIndex(properties= {"dateTo"})
+		,@AIndex(properties= {"disabilityDocument"})
 })
 @Table(schema="SQLUser")
 public class DisabilityRecord extends BaseEntity{

@@ -7,29 +7,28 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <build.plugins.plugin.version>1</build.plugins.plugin.version>
         <pvsstudio.version>7.06.37377</pvsstudio.version>
-        <kotlin.version>1.3.61</kotlin.version>
-            <jdk.version>1.8</jdk.version>
-            <libdir>C:\Users\Енот\IdeaProjects\medos\MedOS_libs\</libdir>
+        <jdk.version>1.8</jdk.version>
     </properties>
-   <!-- <parent>
+    <parent>
         <groupId>ru.ecom</groupId>
         <artifactId>pom</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>2020</version>
         <relativePath>../../../pom/pom.xml</relativePath>
-    </parent>-->
+    </parent>
+
     <groupId>ru.amokb</groupId>
     <artifactId>riams-web</artifactId>
     <version>2020</version>
     <packaging>war</packaging>
 
     <dependencies>
-       <!-- <dependency>
+        <dependency>
             <groupId>uk.ltd.getahead</groupId>
             <artifactId>dwr</artifactId>
             <version>3.0.2-RELEASE</version>
             <systemPath>${libdir}/dwr/dwr.jar</systemPath>
             <scope>system</scope>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -69,13 +68,13 @@
             <scope>system</scope>
             <version>RELEASE</version>
         </dependency>
-        <!--<dependency>
+        <dependency>
             <groupId>ru.ecom</groupId>
             <artifactId>gwt-document</artifactId>
             <systemPath>${libdir}/ecom/gwt/document/ecom-gwt-document.jar</systemPath>
             <scope>system</scope>
             <version>RELEASE</version>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>ru.ecom</groupId>
             <artifactId>gwt-clazz</artifactId>
@@ -97,30 +96,27 @@
             <scope>system</scope>
             <version>RELEASE</version>
         </dependency>
-        <!--<dependency>
+        <dependency>
             <groupId>ru.ecom</groupId>
-            <artifactId>report</artifactId>
-            <systemPath>${libdir}/ecom/report/ecom-report.jar</systemPath>
-            <scope>system</scope>
-            <version>1</version>
-        </dependency>-->
-
-       <!-- <dependency>
+            <artifactId>ecom-report</artifactId>
+            <version>2020</version>
+        </dependency>
+        <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.4</version>
-        </dependency>-->
-       <!-- <dependency>
+        </dependency>
+        <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <version>3.2.2</version>
-        </dependency>-->
-       <!-- <dependency>
+        </dependency>
+        <dependency>
             <groupId>commons-digester</groupId>
             <artifactId>commons-digester</artifactId>
             <version>1.8</version>
-        </dependency>-->
-        <!--<dependency>
+        </dependency>
+        <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
             <version>0.2</version>
@@ -134,45 +130,45 @@
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.2</version>
-        </dependency>-->
-        <!--<dependency>
+        </dependency>
+        <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
             <version>1.6</version>
-        </dependency>-->
-      <!--  <dependency>
+        </dependency>
+        <dependency>
             <groupId>dwr</groupId>
             <artifactId>dwr</artifactId>
             <version>1.1.3</version>
-        </dependency>-->
+        </dependency>
 
 
-        <!--<dependency>
+        <dependency>
             <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>aopalliance-repackaged</artifactId>
             <version>2.6.1</version>
-        </dependency>-->
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.objectweb.asm/org.objectweb.asm -->
-       <!-- <dependency>
+        <dependency>
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
             <version>3.0</version>
-        </dependency>-->
-        <!--<dependency>
+        </dependency>
+        <dependency>
             <groupId>ecs</groupId>
             <artifactId>ecs</artifactId>
             <version>1.4.2</version>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>
             <version>2.2</version>
         </dependency>
-       <!-- <dependency>
+        <dependency>
             <groupId>javax.el</groupId>
             <artifactId>el-api</artifactId>
             <version>1.0</version>
-        </dependency>-->
+        </dependency>
 
         <dependency>
             <groupId>ru.ecom</groupId>
@@ -185,12 +181,177 @@
             <version>RELEASE</version>
             <scope>test</scope>
         </dependency>
-      <!--  <dependency>
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
             <scope>compile</scope>
-        </dependency>-->
+        </dependency>
+
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>http</artifactId>
+            <systemPath>${libdir}/javax/javax.servlet.jsp.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet</artifactId>
+            <systemPath>${libdir}/servlet/servlet-api.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache</groupId>
+            <artifactId>ecs</artifactId>
+            <systemPath>${libdir}/ecs/ecs-1.4.2.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>beanutils</artifactId>
+            <systemPath>${libdir}/struts/WEB-INF/lib/commons-beanutils.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>bsh</groupId>
+            <artifactId>bsh</artifactId>
+            <systemPath>${libdir}/bsh/bsh-2.0b4.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tools</groupId>
+            <artifactId>ant</artifactId>
+            <systemPath>${libdir}/ant/ant.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.nuzmsh</groupId>
+            <artifactId>dbflib</artifactId>
+            <systemPath>${libdir}/msh/dbflib/dbflib-0.1.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>client</artifactId>
+            <systemPath>${libdir}/jboss/jbossall-client.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>ejb3</artifactId>
+            <systemPath>${libdir}/jboss/jboss-ejb3.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.perststense</groupId>
+            <artifactId>codecs</artifactId>
+            <systemPath>${libdir}/hibernate/entitymanager/hibernate-entitymanager.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.entitymanager</groupId>
+            <artifactId>manager</artifactId>
+            <systemPath>${libdir}/hibernate/entitymanager/hibernate3.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>codecs</artifactId>
+            <systemPath>${libdir}/apache-commons/commons-codec-1.10.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com</groupId>
+            <artifactId>jxl</artifactId>
+            <systemPath>${libdir}/jxl/jxl.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>annotations</artifactId>
+            <systemPath>${libdir}/jboss/jboss-annotations-ejb3.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>annotations</artifactId>
+            <systemPath>${libdir}/hibernate/entitymanager/hibernate-annotations.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>javascript</artifactId>
+            <systemPath>${libdir}/rhino/custom_rhino.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache</groupId>
+            <artifactId>struts</artifactId>
+            <systemPath>${libdir}/struts/struts.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <systemPath>${libdir}/jboss/jboss-ejb3x.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.13.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20180813</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.ejb</groupId>
+            <artifactId>javax.ejb-api</artifactId>
+            <version>3.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/javax.persistence/persistence-api -->
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+
+
+        <!-- https://mvnrepository.com/artifact/org.jdom/jdom -->
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <systemPath>${libdir}/jdom/jdom.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+
+
+
     </dependencies>
 
     <build>
@@ -209,17 +370,6 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>com.pvsstudio</groupId>
-                <artifactId>pvsstudio-maven-plugin</artifactId>
-                <version>${pvsstudio.version}</version>
-                <configuration>
-                    <analyzer>
-                        <outputType>text</outputType>
-                        <outputFile>pvs-output.txt</outputFile>
-                    </analyzer>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
@@ -233,11 +383,7 @@
                     <webXml>src/webapp/WEB-INF/web.xml</webXml>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.2</version>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

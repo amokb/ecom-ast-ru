@@ -22,21 +22,21 @@
     <dependency>
         <groupId>org.jboss</groupId>
         <artifactId>aop</artifactId>
-        <systemPath>C:/Users/vtsybulin/IdeaProjects/MedOS_libs/jboss/jboss-aop-jdk50.jar</systemPath>
+        <systemPath>${libdir}/jboss/jboss-aop-jdk50.jar</systemPath>
         <scope>system</scope>
         <version>RELEASE</version>
     </dependency>
     <dependency>
         <groupId>org.jboss</groupId>
         <artifactId>ssx</artifactId>
-        <systemPath>C:/Users/vtsybulin/IdeaProjects/MedOS_libs/jboss/jbosssx.jar</systemPath>
+        <systemPath>${libdir}/jboss/jbosssx.jar</systemPath>
         <scope>system</scope>
         <version>RELEASE</version>
     </dependency>
     <dependency>
         <groupId>org.jboss</groupId>
         <artifactId>system</artifactId>
-        <systemPath>C:/Users/vtsybulin/IdeaProjects/MedOS_libs/jboss/jboss-system.jar</systemPath>
+        <systemPath>${libdir}/jboss/jboss-system.jar</systemPath>
         <scope>system</scope>
         <version>RELEASE</version>
     </dependency>

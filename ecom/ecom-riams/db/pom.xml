@@ -5,11 +5,8 @@
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <properties>
-        <appname>riams-db</appname>
-        <dirname>ecom/riams</dirname>
         <pvsstudio.version>7.06.37377</pvsstudio.version>
         <jdk.version>1.8</jdk.version>
-        <libdir>C:\Users\Енот\IdeaProjects\medos\MedOS_libs\</libdir>
     </properties>
     <groupId>ru.ecom</groupId>
     <artifactId>riams-db</artifactId>
@@ -18,6 +15,13 @@
     <name>riams-db</name>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>codecs</artifactId>
+            <systemPath>${libdir}/apache-commons/commons-codec-1.10.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
         <dependency>
             <groupId>ru.ecom</groupId>
             <artifactId>jboss</artifactId>
@@ -45,6 +49,13 @@
             <version>RELEASE</version>
         </dependency>
         <dependency>
+            <groupId>com</groupId>
+            <artifactId>jxl</artifactId>
+            <systemPath>${libdir}/jxl/jxl.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
             <groupId>bsh</groupId>
             <artifactId>bsh</artifactId>
             <systemPath>${libdir}/bsh/bsh-2.0b4.jar</systemPath>
@@ -52,9 +63,30 @@
             <version>RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>org.apache</groupId>
+            <groupId>org.jboss</groupId>
+            <artifactId>ejb3</artifactId>
+            <systemPath>${libdir}/jboss/jboss-ejb3.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <systemPath>${libdir}/log4j/log4j.jar</systemPath>
+            <version>1.2.17</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.jdom/jdom -->
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <systemPath>${libdir}/jdom/jdom.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.nuzmsh</groupId>
+            <artifactId>dbflib</artifactId>
+            <systemPath>${libdir}/msh/dbflib/dbflib-0.1.jar</systemPath>
             <scope>system</scope>
             <version>RELEASE</version>
         </dependency>
@@ -80,6 +112,20 @@
             <version>RELEASE</version>
         </dependency>
         <dependency>
+            <groupId>org.hibernate.perststense</groupId>
+            <artifactId>codecs</artifactId>
+            <systemPath>${libdir}/hibernate/entitymanager/hibernate-entitymanager.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.entitymanager</groupId>
+            <artifactId>manager</artifactId>
+            <systemPath>${libdir}/hibernate/entitymanager/hibernate3.jar</systemPath>
+            <scope>system</scope>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
             <groupId>ru.ecom</groupId>
             <artifactId>msh</artifactId>
             <version>2020</version>
@@ -87,20 +133,57 @@
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>4.0</version>
+            <version>4.0</version>  <!--4.1-->
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.8.jre7</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>ru.ecom</groupId>
-            <artifactId>report</artifactId>
-            <systemPath>${libdir}/ecom/report/ecom-report.jar</systemPath>
+            <artifactId>ecom-report</artifactId>
+            <version>2020</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache</groupId>
+            <artifactId>struts</artifactId>
+            <systemPath>${libdir}/struts/struts.jar</systemPath>
             <scope>system</scope>
-            <version>1</version>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20180813</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.5</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.6.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
-        <finalName>riams-ejb</finalName>
+        <finalName>riams-db</finalName>
         <!--   <resources>
                <resource>
                    <directory>src/main/resources</directory>
@@ -121,25 +204,6 @@
    -->
 
         <plugins>
-           <!-- <plugin>
-                <groupId>com.pvsstudio</groupId>
-                <artifactId>pvsstudio-maven-plugin</artifactId>
-                <version>${pvsstudio.version}</version>
-                <configuration>
-                    <analyzer>
-                        <outputType>text</outputType>
-                        <outputFile>pvs-output.txt</outputFile>
-                    </analyzer>
-                </configuration>
-            </plugin>-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-ear-plugin</artifactId>
-                <version>2.8</version>
-                <configuration>
-
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -149,7 +213,7 @@
                     <target>${jdk.version}</target>
                 </configuration>
             </plugin>
-
+<!--
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
@@ -164,25 +228,11 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.0</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.2</version>
-               <!-- <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                    </execution>
-                </executions>-->
             </plugin>
 
         </plugins>
