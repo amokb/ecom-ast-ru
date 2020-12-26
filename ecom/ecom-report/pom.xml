@@ -118,7 +118,7 @@
    -->
 
         <plugins>
-            <plugin>
+            <!--<plugin>
                 <groupId>com.pvsstudio</groupId>
                 <artifactId>pvsstudio-maven-plugin</artifactId>
                 <version>${pvsstudio.version}</version>
@@ -128,7 +128,7 @@
                         <outputFile>pvs-output.txt</outputFile>
                     </analyzer>
                 </configuration>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

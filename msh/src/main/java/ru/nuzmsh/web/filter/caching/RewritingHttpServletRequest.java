@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
@@ -146,18 +145,6 @@ public class RewritingHttpServletRequest implements HttpServletRequest {
 
 	}
 
-	public Collection<Part> getParts() throws IOException, ServletException {
-		return null;
-	}
-
-	public Part getPart(String s) throws IOException, ServletException {
-		return null;
-	}
-
-	public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
-		return null;
-	}
-
 	public boolean isRequestedSessionIdFromURL() {
 		return theRequest.isRequestedSessionIdFromURL() ;
 	}
@@ -214,29 +201,6 @@ public class RewritingHttpServletRequest implements HttpServletRequest {
 		return null;
 	}
 
-	public AsyncContext startAsync() throws IllegalStateException {
-		return null;
-	}
-
-	public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) throws IllegalStateException {
-		return null;
-	}
-
-	public boolean isAsyncStarted() {
-		return false;
-	}
-
-	public boolean isAsyncSupported() {
-		return false;
-	}
-
-	public AsyncContext getAsyncContext() {
-		return null;
-	}
-
-	public DispatcherType getDispatcherType() {
-		return null;
-	}
 
 	public Locale getLocale() {
 		return theRequest.getLocale() ;

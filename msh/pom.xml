@@ -16,19 +16,11 @@
     <packaging>jar</packaging>
 
     <dependencies>
+
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>http</artifactId>
-            <systemPath>${libdir}/javax/javax.servlet.jsp.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet</artifactId>
-            <systemPath>${libdir}/servlet/servlet-api.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
         </dependency>
         <dependency>
             <groupId>javax.persistence</groupId>
@@ -46,11 +38,9 @@
             <version>20180813</version>
         </dependency>
         <dependency>
-            <groupId>org.apache</groupId>
+            <groupId>ecs</groupId>
             <artifactId>ecs</artifactId>
-            <systemPath>${libdir}/ecs/ecs-1.4.2.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
+            <version>1.4.2</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
@@ -58,26 +48,21 @@
             <version>1.2.17</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.jdom/jdom -->
         <dependency>
             <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
-            <systemPath>${libdir}/jdom/jdom.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
+            <version>1.1</version>
         </dependency>
         <dependency>
-            <groupId>org.apache</groupId>
-            <artifactId>struts</artifactId>
-            <systemPath>${libdir}/struts/struts.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
+            <groupId>org.apache.struts</groupId>
+            <artifactId>struts-taglib</artifactId>
+            <version>1.3.8</version>
         </dependency>
-        <dependency>
+       <!-- <dependency>
             <groupId>taglibs</groupId>
             <artifactId>standard</artifactId>
             <version>1.1.2</version>
-        </dependency>
+        </dependency>-->
 
         <!-- JSTL -->
         <dependency>
@@ -89,9 +74,7 @@
         <dependency>
             <groupId>uk.ltd.getahead</groupId>
             <artifactId>dwr</artifactId>
-            <version>3.0.2-RELEASE</version>
-            <systemPath>${libdir}/dwr/dwr.jar</systemPath>
-            <scope>system</scope>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -148,13 +131,7 @@
             <scope>system</scope>
             <version>RELEASE</version>
         </dependency>
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>websocket</artifactId>
-            <systemPath>${libdir}/javax/javax.websocket-api-1.1.jar</systemPath>
-            <scope>system</scope>
-            <version>RELEASE</version>
-        </dependency>
+
         <dependency>
             <groupId>com.sun.media</groupId>
             <artifactId>imageioimpl</artifactId>
@@ -164,17 +141,9 @@
         </dependency>
         <dependency>
             <groupId>ru.ecom</groupId>
-            <artifactId>report</artifactId>
-            <systemPath>${libdir}/ecom/report/ecom-report.jar</systemPath>
-            <scope>system</scope>
-            <version>1</version>
+            <artifactId>ecom-report</artifactId>
+            <version>2020</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>5.1.5.RELEASE</version>
-        </dependency>
-
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-runner</artifactId>
