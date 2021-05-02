@@ -1,7 +1,7 @@
 package ru.ecom.report.replace;
 
-import bsh.Interpreter;
 import bsh.EvalError;
+import bsh.Interpreter;
 
 import java.util.TreeSet;
 
@@ -14,23 +14,23 @@ public class BshValueGetter implements IValueGetter {
         try {
             theInterpreter.set(aKey, aValue);
         } catch (EvalError evalError) {
-            throw new SetValueException("Ошибке установки "+aKey+" = "+aValue,evalError);
+            throw new SetValueException("Ошибке установки " + aKey + " = " + aValue, evalError);
         }
-        theKeys.add(aKey) ;
+        theKeys.add(aKey);
     }
 
     public Object getValue(String aExpression) throws SetValueException {
-        if(aExpression!=null && (aExpression.indexOf('[')!=-1 || aExpression.indexOf(']')!=-1)) {
-            aExpression = aExpression.replace('[','{') ;
-            aExpression = aExpression.replace(']','}') ;
+        if (aExpression != null) {
+            aExpression = aExpression.replace('[', '{')
+                    .replace(']', '}')
+                    .replace("&quot;", "\"")
+                    .replace("&lt;", "<")
+                    .replace("&gt;", ">");
         }
-        aExpression = aExpression.replace("&quot;","\"") ;
-        aExpression = aExpression.replace("&lt;","<") ;
-        aExpression = aExpression.replace("&gt;",">") ;
         try {
             return theInterpreter.eval(aExpression);
         } catch (EvalError evalError) {
-            throw new SetValueException("Ошибка получения '"+aExpression+"'",evalError);
+            throw new SetValueException("Ошибка получения '" + aExpression + "'", evalError);
         }
     }
 
@@ -40,6 +40,6 @@ public class BshValueGetter implements IValueGetter {
         }
     }
 
-    TreeSet<String> theKeys = new TreeSet<String>();
+    TreeSet<String> theKeys = new TreeSet<>();
     Interpreter theInterpreter = new Interpreter();
 }

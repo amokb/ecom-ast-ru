@@ -7,5 +7,5 @@ import java.util.Map;
  */
 public interface IValueInit {
 
-    public void init(Map<String,String> aParams, IValueGetter aValueGetter) throws SetValueException;
+    void init(Map<String, String> aParams, IValueGetter aValueGetter) throws SetValueException;
 }

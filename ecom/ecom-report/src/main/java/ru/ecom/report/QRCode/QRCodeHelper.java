@@ -12,9 +12,6 @@ import org.odftoolkit.simple.table.Cell;
 import org.odftoolkit.simple.table.Table;
 import sun.misc.BASE64Encoder;
 
-import javax.ejb.Local;
-import javax.ejb.Remote;
-import javax.ejb.Stateless;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -27,25 +24,23 @@ import java.net.URI;
  * Created by Milamesher on 21.09.2018.
  * Для работы с QR-кодами.
  */
-@Stateless
-@Local(IQRCodeService.class)
-@Remote(IQRCodeService.class)
-public class QRCodeServiceBean implements IQRCodeService {
-    private String QR_CODE_filename="tmpFileForQRCode";
+public class QRCodeHelper {
+    private final String QR_CODE_filename = "tmpFileForQRCode";
+
     //Метод возвращает qr-код с текстом, размерами QR_w и QR_h. default QR_TYPE PNG
     public String generateQRCodeImageBase64(String QR_text, int QR_w, int QR_h, String QR_TYPE) {
-        if (QR_TYPE==null || QR_TYPE.equals("")) QR_TYPE="PNG";
-        String QR_CODE_IMAGE_PATH = QR_CODE_filename+"."+QR_TYPE;
-        String base64=null;
+        if (QR_TYPE == null || QR_TYPE.equals("")) QR_TYPE = "PNG";
+        String QR_CODE_IMAGE_PATH = QR_CODE_filename + "." + QR_TYPE;
+        String base64 = null;
         try {
-            MatrixToImageWriter.writeToStream(new QRCodeWriter().encode(QR_text, BarcodeFormat.QR_CODE, QR_w, QR_h),QR_TYPE,new FileOutputStream(QR_CODE_IMAGE_PATH));
+            MatrixToImageWriter.writeToStream(new QRCodeWriter().encode(QR_text, BarcodeFormat.QR_CODE, QR_w, QR_h), QR_TYPE, new FileOutputStream(QR_CODE_IMAGE_PATH));
             base64 = encodeToString(ImageIO.read(new File(QR_CODE_IMAGE_PATH)), QR_TYPE);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return base64;
     }
+
     //Milamesher #120 14092018  метод получения строки в base64 из файла с изображением
     private String encodeToString(BufferedImage image, String type) {
         String imageString = null;
@@ -59,19 +54,20 @@ public class QRCodeServiceBean implements IQRCodeService {
         }
         return imageString;
     }
+
     //Milamesher #120 19092018 метод вставки qr-кода в файл
-    public Boolean createInsertQRCode(String QR_text,int QR_w, int QR_h, String QR_TYPE,String template,String ext,String replacesource) {
-        Boolean flag = false;
-        if (QR_text!=null && !QR_text.equals("") && QR_w!=0 && QR_h!=0 && template!=null && !template.equals("") && ext!=null && !ext.equals("")
-                && replacesource!=null && !replacesource.equals("")) {
+    public static Boolean createInsertQRCode(String qrText, int qrWeight, int qrHeight, String qrType, String template, String ext, String replaceSource) {
+        boolean flag = false;
+        if (qrText != null && !qrText.equals("") && qrWeight != 0 && qrHeight != 0 && template != null && !template.equals("") && ext != null && !ext.equals("")
+                && replaceSource != null && !replaceSource.equals("")) {
             flag = true;
-            if (QR_TYPE == null || QR_TYPE.equals("")) QR_TYPE = "PNG";
-            String QR_CODE_IMAGE_PATH = template.replace(ext, "") + "." + QR_TYPE;
+            if (qrType == null || qrType.equals("")) qrType = "PNG";
+            String QR_CODE_IMAGE_PATH = template.replace(ext, "") + "." + qrType;
             try {
-                MatrixToImageWriter.writeToStream(new QRCodeWriter().encode(QR_text, BarcodeFormat.QR_CODE, QR_w, QR_h), QR_TYPE, new FileOutputStream(QR_CODE_IMAGE_PATH));
+                MatrixToImageWriter.writeToStream(new QRCodeWriter().encode(qrText, BarcodeFormat.QR_CODE, qrWeight, qrHeight), qrType, new FileOutputStream(QR_CODE_IMAGE_PATH));
                 File file = new File(QR_CODE_IMAGE_PATH);
                 if (file.exists()) {
-                    flag = putQRImage(file.toURI(), template, replacesource);
+                    flag = putQRImage(file.toURI(), template, replaceSource);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -80,20 +76,21 @@ public class QRCodeServiceBean implements IQRCodeService {
         }
         return flag;
     }
+
     //Milamesher #120 130092018  метод замены кодового слова на QR-код
-    private Boolean putQRImage(URI uri,String template, String replacesource) {
+    private static Boolean putQRImage(URI uri, String template, String replaceSource) {
         try {
-            Document  textdoc=null;
+            Document textdoc;
             if (template.endsWith(".odt")) {
                 textdoc = TextDocument.loadDocument(template);
-                TextNavigation search = new TextNavigation(replacesource, textdoc);
-                if ( uri != null) {
+                TextNavigation search = new TextNavigation(replaceSource, textdoc);
+                if (uri != null) {
                     while (search.hasNext()) {
                         TextSelection item = (TextSelection) search.nextSelection();
                         try {
                             if (item != null) item.replaceWith(uri);
+                        } catch (NullPointerException e) {
                         }
-                        catch(NullPointerException e) {}
                     }
                 }
             }
@@ -106,7 +103,7 @@ public class QRCodeServiceBean implements IQRCodeService {
                     for (int i = 0; i < t.getRowCount(); i++) {
                         for (int j = 0; i < t.getRowByIndex(i).getCellCount(); j++) {
                             Cell c = t.getCellByPosition(i, j);
-                            if (c.getDisplayText().contains(replacesource)) {
+                            if (c.getDisplayText().contains(replaceSource)) {
                                 c.setImage(uri);
                                 flag = true;
                                 break;
@@ -115,10 +112,11 @@ public class QRCodeServiceBean implements IQRCodeService {
                         }
                     }
                 }
+            } else {
+                textdoc = null;
             }
-            if (textdoc!=null) textdoc.save(template);
-        }
-        catch (Exception e) {
+            if (textdoc != null) textdoc.save(template);
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }

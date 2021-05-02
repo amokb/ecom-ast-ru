@@ -1,6 +1,7 @@
 package ru.ecom.report.rtf;
 
 import bsh.EvalError;
+import ru.ecom.report.QRCode.QRCodeHelper;
 import ru.ecom.report.replace.IValueInit;
 import ru.ecom.report.replace.ReplaceHelper;
 import ru.ecom.report.util.ClassLoaderServiceHelper;
@@ -70,8 +71,7 @@ public class RtfPrintServiceHelper {
 			 try {
 			 	if (driver instanceof OdtPrintFileDriver) {
 					OdtPrintFileDriver d = (OdtPrintFileDriver)driver;
-					ru.ecom.report.QRCode.QRCodeServiceBean bean = new ru.ecom.report.QRCode.QRCodeServiceBean();
-					bean.createInsertQRCode(d.getQR_text(), d.getQR_w(), d.getQR_h(), "PNG", theWorkDir + "/" + driver.getResultFilename(), d.getExtension(), d.getReplaceString());
+					QRCodeHelper.createInsertQRCode(d.getQR_text(), d.getQR_w(), d.getQR_h(), "PNG", theWorkDir + "/" + driver.getResultFilename(), d.getExtension(), d.getReplaceString());
 				}
 			 }
 			 catch (Exception e) {

@@ -7,7 +7,7 @@ import java.util.Set;
  */
 public interface ILoginService {
     /** Получить список ролей пользователя */
-    Set getUserRoles() ;
+    Set<String> getUserRoles() ;
 	Long createSystemMessage(String aTitle, String aText, String aRecipient) ;
 	void dispatchMessage(Long aIdMessage) ;
     void checkMessage(Long aIdMessage);
